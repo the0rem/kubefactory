@@ -41,8 +41,12 @@ func (params *launchParams) Launch() {
   }
 
   // Deploy generated template files to kubernetes endpoint
-  for key, value := range files {
+  for _, value := range files {
     
+    if value.IsDir() {
+      continue
+    }
+
     // Create wait group
     wg := new(sync.WaitGroup)
     
