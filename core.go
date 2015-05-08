@@ -1,6 +1,11 @@
 package main
 
-import "os/exec"
+import {
+
+  "os/exec"
+  "sync"
+
+}
 
 func ExecCmd(cmd string, wg *sync.WaitGroup) {
 
