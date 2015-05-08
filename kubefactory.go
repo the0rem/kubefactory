@@ -70,10 +70,10 @@ var (
 	 */
 	link = app.Command("link", "Manage synchronised folders between local and remote environments.")
 
-	links      = link.Command("list", "Get current links.")
+	linkList   = link.Command("list", "Get current links.")
 	linkRemove = link.Command("remove", "Remove a link (Data will persist on remote).")
 
-	addlink = link.Command("add", "Add a new link.")
+	linkAdd = link.Command("add", "Add a new link.")
 	linkKey = addlink.Flag("SSH Key", "Path to SSH key for remote login.").ExistingFile()
 	local   = addlink.Arg("local", "Path to local folder.").Required().ExistingDir()
 	remote  = addlink.Arg("remote", "Remote .").Required().String()
@@ -81,32 +81,70 @@ var (
 
 func main() {
 
-	// switch kingpin.MustParse(app.Parse(os.Args[1:])) {
+  result := kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	// case launch.FullCommand():
-	//   println(*environment)
+  println(result)
+  println()
 
-	// }
+	switch result {
 
-	switch app.Parse() {
+	case generate.FullCommand():
+    
+    println((*generate).FullCommand())
+		// Generate()
+    
+	case build.FullCommand():
 
-	case "generate":
-		Generate()
-	case "build":
-		Build()
-	case "launch":
-		Launch()
-	case "enter":
-		Enter()
-	case "supercede":
-		Supercede()
-	case "kill":
-		Kill()
-	case "link list":
-		Link.List()
-	case "link add":
-		Link.Add()
-	case "link remove":
-		Link.Remove()
+    println((*build).FullCommand())
+		// Build()
+
+	case launch.FullCommand():
+
+    println((*launch).FullCommand())
+    // deployment := new(launchParams)
+		
+    // deployment.configure()
+    // deployment.Launch()
+
+	case enter.FullCommand():
+
+    println((*enter).FullCommand())
+		println(*container)
+    // Enter()
+
+	case supercede.FullCommand():
+
+    println((*supercede).FullCommand())
+		// Supercede()
+
+	case kill.FullCommand():
+
+    println((*kill).FullCommand())
+		// Kill([]string{"rc1","service1"})
+
+	case (*linkList).FullCommand():
+    
+    println((*linkList).FullCommand())
+  //   dirSync := new (dirSync)
+
+  //   dirSync.configure()
+		// dirSync.List()
+
+	case (*linkAdd).FullCommand():
+
+    println((*linkAdd).FullCommand())
+  //   dirSync := new (dirSync)
+    
+  //   dirSync.configure()
+		// dirSync.Add()
+
+	case (*linkRemove).FullCommand():
+
+    println((*linkRemove).FullCommand())
+  //   dirSync := new (dirSync)
+    
+  //   dirSync.configure()
+		// dirSync.Remove()
+
 	}
 }
