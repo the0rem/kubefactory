@@ -1,10 +1,11 @@
 package main
 
 
-
 func Enter() {
+  
+  commands := []string{"kubectl -c " +  + " -p " +  + " -it"}
+
   wg := new(sync.WaitGroup)
-  commands := []string{""}
     
   for _, str := range commands {
     wg.Add(1)
