@@ -51,7 +51,7 @@ func (params *launchParams) Launch() {
     wg := new(sync.WaitGroup)
     
     // Set array of commands to run
-    commands := []string{"kubectl create -f " + value}
+    commands := []string{"kubectl create -f " + params.distDir + value.Name()}
     
     // Execute commands
     for _, str := range commands {
