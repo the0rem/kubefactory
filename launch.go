@@ -73,7 +73,7 @@ func (params *launchParams) Launch() {
   
   // Set array of commands to run
   // // Output current state of deployment
-  commands := ExecCmd([]string{"kubectl cluster-info", "kubectl get minions", "kubectl get services", "kubectl get replicationcontrollers", "kubectl get pods"})
+  commands := []string{"kubectl cluster-info", "kubectl get minions", "kubectl get services", "kubectl get replicationcontrollers", "kubectl get pods"}
   
   // Execute commands
   for _, str := range commands {
