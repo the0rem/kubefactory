@@ -31,25 +31,54 @@ func (params *launchParams) configure() {
 
 func (params *launchParams) Launch() {
 
+  // Get list of files in dist
+  files, error := ioutil.ReadDir(params.distDir)
 
-  # Build tempaltes using environmental variables
-    for file in $distDir/*.yaml; do
+  // Check for existence of deployment
+  if error {
 
-        kubectl create -f $file
-        echo "Creating $file"
+  }
 
-    done
-
-
-  wg := new(sync.WaitGroup)
-  commands := []string{""}
+  // Deploy generated template files to kubernetes endpoint
+  for key, value := range files {
     
+    // Create wait group
+    wg := new(sync.WaitGroup)
+    
+    // Set array of commands to run
+    commands := []string{"kubectl create -f " + value}
+    
+    // Execute commands
+    for _, str := range commands {
+      wg.Add(1)
+      go ExecCmd(str, wg)
+    }
+    
+    // Don't loop until command is complete
+    wg.Wait()
+
+  }
+
+  // If deployment currently exists, ask if we want to override
+  // (Should be a flag to force)
+  
+
+  // Create wait group
+  wg := new(sync.WaitGroup)
+  
+  // Set array of commands to run
+  // // Output current state of deployment
+  commands := ExecCmd([]string{"kubectl cluster-info", "kubectl get minions", "kubectl get services", "kubectl get replicationcontrollers", "kubectl get pods"})
+  
+  // Execute commands
   for _, str := range commands {
     wg.Add(1)
     go ExecCmd(str, wg)
   }
   
+  // Don't loop until command is complete
   wg.Wait()
+
 }
 
 
