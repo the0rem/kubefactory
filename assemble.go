@@ -1,4 +1,4 @@
-package kubefactory
+package main
 
 
 func Assemble() {
