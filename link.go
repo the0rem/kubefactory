@@ -4,7 +4,20 @@ import (
 
   "sync"
 
-func Link() {
+)
+
+type dirSync struct {
+  from, to string
+}
+
+func (link *dirSync) configure() {
+  
+  link.from = "yomama"
+  link.to = "mymama"
+  
+}
+
+func (link *dirSync) List() {
   wg := new(sync.WaitGroup)
   commands := []string{""}
     
@@ -16,7 +29,7 @@ func Link() {
   wg.Wait()
 }
 
-func List() {
+func (link *dirSync) Remove() {
   wg := new(sync.WaitGroup)
   commands := []string{""}
     
@@ -28,19 +41,7 @@ func List() {
   wg.Wait()
 }
 
-func Remove() {
-  wg := new(sync.WaitGroup)
-  commands := []string{""}
-    
-  for _, str := range commands {
-    wg.Add(1)
-    go ExecCmd(str, wg)
-  }
-  
-  wg.Wait()
-}
-
-func Add() {
+func (link *dirSync) Add() {
   wg := new(sync.WaitGroup)
   commands := []string{""}
     
