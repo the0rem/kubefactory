@@ -35,9 +35,9 @@ func (params *launchParams) Launch() {
   // Get list of files in dist
   files, error := ioutil.ReadDir(params.distDir)
 
-  // Check for existence of deployment
-  if error {
-
+  // Check for error finding files
+  if error != nil {
+    return
   }
 
   // Deploy generated template files to kubernetes endpoint
