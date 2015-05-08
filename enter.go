@@ -8,7 +8,10 @@ import (
 
 func Enter() {
   
-  commands := []string{"kubectl -c " +  + " -p " +  + " -it"}
+  pod, container := "", ""
+
+
+  commands := []string{"kubectl -c " + container + " -p " + pod + " -it"}
 
   wg := new(sync.WaitGroup)
     
