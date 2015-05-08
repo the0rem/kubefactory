@@ -1,6 +1,8 @@
 package main
 
+import (
 
+  "sync"
 
 func Link() {
   wg := new(sync.WaitGroup)

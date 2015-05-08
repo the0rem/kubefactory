@@ -1,6 +1,10 @@
 package main
 
+import (
 
+  "sync"
+
+)
 
 func Generate() {
   wg := new(sync.WaitGroup)

@@ -1,6 +1,10 @@
 package main
 
+import (
 
+  "sync"
+
+)
 
 // Kill removes 
 func Kill(targets []string)  {

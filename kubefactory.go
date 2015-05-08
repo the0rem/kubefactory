@@ -11,8 +11,10 @@ package main
 import (
 	"os"
 	// "strings"
+  // "fmt" 
 	"gopkg.in/alecthomas/kingpin.v1"
-  "github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl/cmd"
+  // "github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl/cmd"
+
 )
 
 var (

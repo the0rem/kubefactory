@@ -1,5 +1,10 @@
 package main
 
+import (
+
+  "sync"
+
+)
 
 func Assemble() {
   wg := new(sync.WaitGroup)

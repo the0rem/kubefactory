@@ -1,16 +1,17 @@
 package main
 
 import (
-  "os"
-  "os/exec"
+  // "os"
+  // "os/exec"
   "io/ioutil"
+  "sync"
   // "strings"
   
   // Run kubectl commands
-  "github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl/cmd"
+  // "github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl/cmd"
 
   // Run client methods available in kubectl
-  "github.com/GoogleCloudPlatform/kubernetes/pkg/client"
+  // "github.com/GoogleCloudPlatform/kubernetes/pkg/client"
 )
 
 type launchParams struct {

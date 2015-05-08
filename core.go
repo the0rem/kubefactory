@@ -1,11 +1,13 @@
 package main
 
-import {
+import (
 
   "os/exec"
   "sync"
+  "fmt"
+  "strings"
 
-}
+)
 
 func ExecCmd(cmd string, wg *sync.WaitGroup) {
 
