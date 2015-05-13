@@ -11,10 +11,9 @@ package main
 import (
 	"os"
 	// "strings"
-  // "fmt" 
+	// "fmt"
 	"gopkg.in/alecthomas/kingpin.v1"
-  // "github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl/cmd"
-
+	// "github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl/cmd"
 )
 
 var (
@@ -74,76 +73,76 @@ var (
 	linkRemove = link.Command("remove", "Remove a link (Data will persist on remote).")
 
 	linkAdd = link.Command("add", "Add a new link.")
-	linkKey = addlink.Flag("SSH Key", "Path to SSH key for remote login.").ExistingFile()
-	local   = addlink.Arg("local", "Path to local folder.").Required().ExistingDir()
-	remote  = addlink.Arg("remote", "Remote .").Required().String()
+	linkKey = linkAdd.Flag("SSH Key", "Path to SSH key for remote login.").ExistingFile()
+	local   = linkAdd.Arg("local", "Path to local folder.").Required().ExistingDir()
+	remote  = linkAdd.Arg("remote", "Remote .").Required().String()
 )
 
 func main() {
 
-  result := kingpin.MustParse(app.Parse(os.Args[1:]))
+	result := kingpin.MustParse(app.Parse(os.Args[1:]))
 
-  println(result)
-  println()
+	println(result)
+	println()
 
 	switch result {
 
 	case generate.FullCommand():
-    
-    println((*generate).FullCommand())
+
+		println((*generate).FullCommand())
 		// Generate()
-    
+
 	case build.FullCommand():
 
-    println((*build).FullCommand())
-		// Build()
+		println((*build).FullCommand())
+		Build()
 
 	case launch.FullCommand():
 
-    println((*launch).FullCommand())
-    // deployment := new(launchParams)
-		
-    // deployment.configure()
-    // deployment.Launch()
+		println((*launch).FullCommand())
+		// deployment := new(launchParams)
+
+		// deployment.configure()
+		// deployment.Launch()
 
 	case enter.FullCommand():
 
-    println((*enter).FullCommand())
+		println((*enter).FullCommand())
 		println(*container)
-    // Enter()
+		// Enter()
 
 	case supercede.FullCommand():
 
-    println((*supercede).FullCommand())
+		println((*supercede).FullCommand())
 		// Supercede()
 
 	case kill.FullCommand():
 
-    println((*kill).FullCommand())
+		println((*kill).FullCommand())
 		// Kill([]string{"rc1","service1"})
 
 	case (*linkList).FullCommand():
-    
-    println((*linkList).FullCommand())
-  //   dirSync := new (dirSync)
 
-  //   dirSync.configure()
+		println((*linkList).FullCommand())
+		//   dirSync := new (dirSync)
+
+		//   dirSync.configure()
 		// dirSync.List()
 
 	case (*linkAdd).FullCommand():
 
-    println((*linkAdd).FullCommand())
-  //   dirSync := new (dirSync)
-    
-  //   dirSync.configure()
+		println((*linkAdd).FullCommand())
+		//   dirSync := new (dirSync)
+
+		//   dirSync.configure()
 		// dirSync.Add()
 
 	case (*linkRemove).FullCommand():
 
-    println((*linkRemove).FullCommand())
-  //   dirSync := new (dirSync)
-    
-  //   dirSync.configure()
+		println((*linkRemove).FullCommand())
+		//   dirSync := new (dirSync)
+
+		//   dirSync.configure()
 		// dirSync.Remove()
 
 	}
