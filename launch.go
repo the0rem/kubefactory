@@ -96,7 +96,7 @@ func (params *launchParams) Launch() {
 
 
 
-
+/*
 # Parse arguments
 usage() {
     echo "Usage: $0 [-h] [-v] -e ENV"
@@ -192,3 +192,4 @@ kubectl get minions
 kubectl get services
 kubectl get replicationcontrollers
 kubectl get pods
+*/
