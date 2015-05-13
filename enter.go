@@ -1,24 +1,24 @@
 package main
 
 import (
-
-  "sync"
-
+	"sync"
 )
 
 func Enter() {
-  
-  pod, container := "", ""
 
+	pod, container := "", ""
 
-  commands := []string{"kubectl -c " + container + " -p " + pod + " -it"}
+	// Search for a pod/replication controller with the entered name
+	// Get a container in the found item
 
-  wg := new(sync.WaitGroup)
-    
-  for _, str := range commands {
-    wg.Add(1)
-    go ExecCmd(str, wg)
-  }
-  
-  wg.Wait()
+	commands := []string{"kubectl -c " + container + " -p " + pod + " -it"}
+
+	wg := new(sync.WaitGroup)
+
+	for _, str := range commands {
+		wg.Add(1)
+		go ExecCmd(str, wg)
+	}
+
+	wg.Wait()
 }
