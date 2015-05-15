@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"sync"
+	// "sync"
 )
 
 type generatorOptions struct {
@@ -12,7 +12,7 @@ type generatorOptions struct {
 	envSource      string
 }
 
-func (options *generatorOptions) Generate(templateSource, envSource) {
+func (options *generatorOptions) Generate(templateSource, envSource string) {
 
 	consolereader := bufio.NewReader(os.Stdin)
 	fmt.Print("Enter your name : ")
@@ -39,11 +39,11 @@ func (options *generatorOptions) Generate(templateSource, envSource) {
 
 func start() {
 
-	consolereader := bufio.NewReader(os.Stdin)
+	// consolereader := bufio.NewReader(os.Stdin)
 	fmt.Println("Welcome to the template generator. To get started, answer from the options below:")
 	fmt.Println("[0] Create a new file")
 	fmt.Println("[1] Edit an existing file")
 
-	input, err := consolereader.ReadString('\n')
+	// input, err := consolereader.ReadString('\n')
 
 }

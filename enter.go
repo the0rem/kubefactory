@@ -2,6 +2,7 @@ package main
 
 import (
 	"sync"
+	// "github.com/codeskyblue/go-sh"
 )
 
 func Enter() {

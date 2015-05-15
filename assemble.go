@@ -1,10 +1,10 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"os"
-	"sync"
+// "bufio"
+// "fmt"
+// "os"
+// "sync"
 )
 
 type Assemblor struct {
