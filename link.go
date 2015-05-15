@@ -1,14 +1,14 @@
 package main
 
 import (
-	"sync"
+	"github.com/codeskyblue/go-sh"
 )
 
 /**
  *
  */
 type dirSync struct {
-	from, to string
+	from, to, user, host string
 }
 
 /**
@@ -24,37 +24,24 @@ func (link *dirSync) configure(from, to string) {
 }
 
 func (link *dirSync) List() {
-	wg := new(sync.WaitGroup)
-	commands := []string{""}
 
-	for _, str := range commands {
-		wg.Add(1)
-		go ExecCmd(str, wg)
-	}
-
-	wg.Wait()
 }
 
 func (link *dirSync) Remove() {
-	wg := new(sync.WaitGroup)
-	commands := []string{""}
 
-	for _, str := range commands {
-		wg.Add(1)
-		go ExecCmd(str, wg)
-	}
-
-	wg.Wait()
 }
 
 func (link *dirSync) Add() {
-	wg := new(sync.WaitGroup)
-	commands := []string{""}
 
-	for _, str := range commands {
-		wg.Add(1)
-		go ExecCmd(str, wg)
-	}
+	msg, err := sh.Command("lsyncd", " -nodaemon", "-rsyncssh", link.from, link.user+"@"+link.host, link.to).Output()
+	// Base rsync call for transferring files
+	// rsync -chavzP --delete --stats ./ root@os.dev.digitalpacific.com.au:/tmp/test
 
-	wg.Wait()
+	//
+	// watchout(){ notify_loop /Users/work/code/fig-esm/; rsync -chavzP --stats --delete /Users/work/code/fig-esm/ root@os.dev.digitalpacific.com.au:/tmp/test && watchout; }; watchout > /dev/null &
+
+	lsyncd[OPTIONS] - rsyncssh[SOURCE][HOST][TARGETDIR]
+	// Convert byte array to string
+	output = string(msg[:])
+
 }
