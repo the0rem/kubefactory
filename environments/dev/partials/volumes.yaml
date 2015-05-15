@@ -1,0 +1,3 @@
+- name: frontent-dev-volume
+  persistentVolumeClaim:
+       claimName: frontent-dev-volume

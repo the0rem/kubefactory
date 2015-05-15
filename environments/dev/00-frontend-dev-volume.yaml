@@ -1,0 +1,13 @@
+kind: PersistentVolume
+apiVersion: v1beta3
+metadata:
+  name: frontend-dev-volume
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/tmp/data02"
