@@ -1,100 +1,77 @@
 package main
 
 import (
-  // "os"
-  // "os/exec"
-  "io/ioutil"
-  "sync"
-  // "strings"
-  
-  // Run kubectl commands
-  // "github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl/cmd"
-
-  // Run client methods available in kubectl
-  // "github.com/GoogleCloudPlatform/kubernetes/pkg/client"
+	"github.com/codeskyblue/go-sh"
+	"github.com/fatih/color"
+	// "github.com/joho/godotenv/autoload"
+	"github.com/joho/godotenv"
+	"io/ioutil"
 )
 
 type launchParams struct {
-  distDir           string
-  environment       string
-  envFile           string
-  sourceFilePrefix  string
+	distDir          string
+	environment      string
+	envFile          string
+	sourceFilePrefix string
 }
 
-func (params *launchParams) configure() {
-  
-  params.distDir="${PWD}/dist"
-  params.environment="dev"
-  params.envFile=""
-  params.sourceFilePrefix=".kubectl_"
-  
+func (params *launchParams) Configure(distDir, environment string) {
+
+	params.distDir = distDir
+	params.environment = environment
+	params.envFile = ".kfenv_" + environment
+
 }
 
 func (params *launchParams) Launch() {
 
-  // Get list of files in dist
-  files, error := ioutil.ReadDir(params.distDir)
+	// Get list of files in dist
+	files, err := ioutil.ReadDir(params.distDir)
 
-  // Check for error finding files
-  if error != nil {
-    return
-  }
+	// Check for error finding files
+	if err != nil {
 
-  // Deploy generated template files to kubernetes endpoint
-  for _, value := range files {
-    
-    if value.IsDir() {
-      continue
-    }
+	}
 
-    // Create wait group
-    wg := new(sync.WaitGroup)
-    
-    // Set array of commands to run
-    commands := []string{"kubectl create -f " + params.distDir + value.Name()}
-    
-    // Execute commands
-    for _, str := range commands {
-      wg.Add(1)
-      go ExecCmd(str, wg)
-    }
-    
-    // Don't loop until command is complete
-    wg.Wait()
+	// Get env variables
+	err = godotenv.Load(params.envFile)
 
-  }
+	if err != nil {
 
-  // If deployment currently exists, ask if we want to override
-  // (Should be a flag to force)
-  
+	}
 
-  // Create wait group
-  wg := new(sync.WaitGroup)
-  
-  // Set array of commands to run
-  // // Output current state of deployment
-  commands := []string{"kubectl cluster-info", "kubectl get minions", "kubectl get services", "kubectl get replicationcontrollers", "kubectl get pods"}
-  
-  // Execute commands
-  for _, str := range commands {
-    wg.Add(1)
-    go ExecCmd(str, wg)
-  }
-  
-  // Don't loop until command is complete
-  wg.Wait()
+	// Create a session
+	session := sh.NewSession()
+
+	// Deploy generated template files to kubernetes endpoint
+	for _, value := range files {
+
+		if value.IsDir() {
+			continue
+		}
+
+		// TODO: add correct env files
+		filename := params.distDir + value.Name()
+		msg, err := session.Command("kubectl", "--kubeconfig=params.envFile", "create", "-f", filename).Output()
+
+		if err != nil {
+
+		}
+
+		output := string(msg[:])
+
+		color.White(output)
+
+	}
+
+	// Output status of machine
+	msg, err = session.Command("kubectl", "cluster-info").Output()
+	msg, err = session.Command("kubectl", "get", "minions").Output()
+	msg, err = session.Command("kubectl", "get", "services").Output()
+	msg, err = session.Command("kubectl", "get", "replicationcontrollers").Output()
+	msg, err = session.Command("kubectl", "get", "pods").Output()
 
 }
-
-
-
-
-
-
-
-
-
-
 
 /*
 # Parse arguments
@@ -169,14 +146,14 @@ if [ $update -eq 1 ]; then
     for file in $distDir/*.yaml; do
 
         isReplicationController=$(grep 'kind: ReplicationController' $file)
-        
+
         if [ -z $isReplicationController ]; then
             # Runs a graceful update of the deployed applicaiton
             kubectl rolling-update "$deploymentName" --update-period="$deployDelay"s -f "$newDeploymentFile"
         fi
 
     done
-else 
+else
 
     # Build tempaltes using environmental variables
     for file in $distDir/*.yaml; do
