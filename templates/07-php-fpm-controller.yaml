@@ -1,0 +1,24 @@
+
+kind: ReplicationController
+apiVersion: v1beta3
+metadata:
+  name: phpfpm
+  labels:
+    name: phpfpm
+spec:
+  replicas: 3
+  selector:
+    name: phpfpm
+  template:
+    metadata:
+      labels:
+        name: phpfpm
+    spec:
+      containers:
+        - name: phpfpm
+          image: dylanlindgren/docker-laravel-phpfpm
+          # Make sure we always get the latest image
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9000
+              protocol: TCP
