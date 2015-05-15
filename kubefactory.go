@@ -9,14 +9,15 @@ for generating templates, launching into containers and remote folder synchronis
 package main
 
 import (
-	"os"
-	// "strings"
-	// "fmt"
 	"gopkg.in/alecthomas/kingpin.v1"
-	// "github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl/cmd"
+	"os"
+	"path/filepath"
 )
 
 var (
+
+	// Get path to current directory
+	filePath, err = filepath.Abs(filepath.Dir(os.Args[0]))
 
 	/**
 	 * Initialise main app and general options
@@ -25,6 +26,7 @@ var (
 	debug       = app.Flag("debug", "Enable debug mode.").Bool()
 	appTest     = app.Flag("dryrun", "Take it for a test drive first.").Bool()
 	environment = app.Flag("environment", "Environment to control. Default 'dev'").Default("dev").String()
+	envFile     = app.Flag("envFile", "Environment file for connecting to kubernetes. (Default: "+filePath+"/.kfenv_dev)").Default(filePath + "/.kfenv_dev").String()
 	fleetctl    = app.Flag("fleetctl-endpoint", "Enpoint for fleetctl.").OverrideDefaultFromEnvar("FLEETCTL_ENDPOINT").URL()
 	kubernetes  = app.Flag("kubernetes-master", "Enpoint for kubernetes.").OverrideDefaultFromEnvar("KUBERNETES_MASTER").URL()
 
@@ -36,13 +38,17 @@ var (
 	/**
 	 * Add command to handle building deployment files from templates
 	 */
-	build = app.Command("build", "Configure a new deployment from template files.")
+	build          = app.Command("build", "Configure a new deployment from template files.")
+	envDir         = build.Arg("envDir", "Root directory for environment directories").Default(filePath + "/environments/").String()
+	templateSource = build.Arg("templateSource", "Source directory for YAML deployment templates").Default(filePath + "/templates/").String()
+	buildDest      = build.Arg("buildDest", "Destination directory for saving generated distribution files").Default(filePath + "/dist/").String()
 
 	/**
 	 * Add command to launch built configs
 	 * @type {[type]}
 	 */
-	launch = app.Command("launch", "Launch templates in an environment.")
+	launch    = app.Command("launch", "Launch templates in an environment.")
+	launchSrc = launch.Arg("launchSrc", "Source directory for loading template files").Default(filePath + "/dist/").String()
 
 	/**
 	 * Add command to enter a container via bash
@@ -69,21 +75,22 @@ var (
 	 */
 	link = app.Command("link", "Manage synchronised folders between local and remote environments.")
 
-	linkList   = link.Command("list", "Get current links.")
-	linkRemove = link.Command("remove", "Remove a link (Data will persist on remote).")
+	linkList = link.Command("list", "Get current links.")
 
 	linkAdd = link.Command("add", "Add a new link.")
 	linkKey = linkAdd.Flag("SSH Key", "Path to SSH key for remote login.").ExistingFile()
 	local   = linkAdd.Arg("local", "Path to local folder.").Required().ExistingDir()
 	remote  = linkAdd.Arg("remote", "Remote .").Required().String()
+
+	linkRemove = link.Command("remove", "Remove a link (Data will persist on remote).")
 )
 
 func main() {
 
 	result := kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	println(result)
-	println()
+	// println(result)
+	// println()
 
 	switch result {
 
@@ -94,16 +101,16 @@ func main() {
 
 	case build.FullCommand():
 
-		println((*build).FullCommand())
-		Build()
+		builder := new(builder)
+		builder.Configure(*buildDest, *templateSource, *envDir+*environment+"/partials/")
+		builder.Build()
 
 	case launch.FullCommand():
 
-		println((*launch).FullCommand())
-		// deployment := new(launchParams)
+		deployment := new(launchParams)
 
-		// deployment.configure()
-		// deployment.Launch()
+		deployment.Configure(*launchSrc, *envFile+*environment)
+		deployment.Launch()
 
 	case enter.FullCommand():
 
