@@ -25,6 +25,8 @@ func (params *launchParams) Configure(distDir, environment string) {
 
 func (params *launchParams) Launch() {
 
+	var msg []byte
+
 	// Get list of files in dist
 	files, err := ioutil.ReadDir(params.distDir)
 
@@ -52,7 +54,7 @@ func (params *launchParams) Launch() {
 
 		// TODO: add correct env files
 		filename := params.distDir + value.Name()
-		msg, err := session.Command("kubectl", "--kubeconfig=params.envFile", "create", "-f", filename).Output()
+		msg, err = session.Command("kubectl", "--kubeconfig=params.envFile", "create", "-f", filename).Output()
 
 		if err != nil {
 
