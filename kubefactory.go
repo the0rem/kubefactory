@@ -78,12 +78,14 @@ var (
 
 	linkList = link.Command("list", "Get current links.")
 
-	linkAdd = link.Command("add", "Add a new link.")
-	linkKey = linkAdd.Flag("SSH Key", "Path to SSH key for remote login.").ExistingFile()
-	local   = linkAdd.Arg("local", "Path to local folder.").Required().ExistingDir()
-	remote  = linkAdd.Arg("remote", "Remote .").Required().String()
+	linkAdd  = link.Command("add", "Add a new link.")
+	linkKey  = linkAdd.Flag("SSH Key", "Path to SSH key for remote login.").ExistingFile()
+	linkFrom = linkAdd.Arg("from", "Path to local folder.").Required().ExistingDir()
+	linkTo   = linkAdd.Arg("to", "Remote destination (Must be of the form \"user@host:path/to/dir\"").Required().String()
 
-	linkRemove = link.Command("remove", "Remove a link (Data will persist on remote).")
+	linkUp     = link.Command("up", "Enable a currently saved link.")
+	linkDown   = link.Command("down", "Disable a currently saved link.")
+	linkRemove = link.Command("remove", "Disable and remove a link.")
 )
 
 func main() {
@@ -134,27 +136,30 @@ func main() {
 
 	case (*linkList).FullCommand():
 
-		println((*linkList).FullCommand())
-		//   dirSync := new (dirSync)
-
-		//   dirSync.configure()
-		// dirSync.List()
+		dirSync := new(dirSync)
+		dirSync.List()
 
 	case (*linkAdd).FullCommand():
 
-		println((*linkAdd).FullCommand())
-		//   dirSync := new (dirSync)
+		dirSync := new(dirSync)
 
-		//   dirSync.configure()
-		// dirSync.Add()
+		dirSync.Configure(*linkFrom, *linkTo)
+		dirSync.Add()
 
 	case (*linkRemove).FullCommand():
 
-		println((*linkRemove).FullCommand())
-		//   dirSync := new (dirSync)
+		dirSync := new(dirSync)
+		dirSync.Remove()
 
-		//   dirSync.configure()
-		// dirSync.Remove()
+	case (*linkUp).FullCommand():
+
+		dirSync := new(dirSync)
+		dirSync.Up()
+
+	case (*linkDown).FullCommand():
+
+		dirSync := new(dirSync)
+		dirSync.Down()
 
 	}
 }
