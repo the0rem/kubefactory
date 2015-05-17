@@ -9,9 +9,7 @@ import (
 	"path/filepath"
 )
 
-/**
- *
- */
+// Save required diretory locations for methods
 type builder struct {
 	destination    string
 	templateSource string
@@ -19,7 +17,7 @@ type builder struct {
 }
 
 /**
- * [func description]
+ * Saves the required configuration options
  * @param  {[type]} build *builder)     Configure(destination, templateSource, envSource string [description]
  * @return {[type]}       [description]
  */
@@ -72,7 +70,7 @@ func (build *builder) Configure(destination, templateSource, envSource string) {
 }
 
 /**
- * [func description]
+ * Build the template files for the environment
  * @param  {[type]} build *builder)     Build( [description]
  * @return {[type]}       [description]
  */
