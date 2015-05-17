@@ -53,8 +53,9 @@ var (
 	/**
 	 * Add command to enter a container via bash
 	 */
-	enter     = app.Command("enter", "Deploy templates to environment.")
-	container = enter.Arg("container", "Name of container to enter.").Required().String()
+	enter         = app.Command("enter", "Open an interactive terminal within a container. This is useful for gaining  access to containers when developing, or debugging critical issues in production. You can liken it to SSH access.")
+	podName       = enter.Arg("podName", "Name of pod to enter. We're smart enough to figure out which one, so give us the start of the name.").Required().String()
+	containerName = enter.Arg("containerName", "Name of container to enter. We're smart enough to figure out which one, so give us the start of the name. If it's the same as the pod, you don't need to add the container.").String()
 
 	/**
 	 * Add command to scale up new container versions while scaling down old versions
@@ -114,9 +115,12 @@ func main() {
 
 	case enter.FullCommand():
 
-		println((*enter).FullCommand())
-		println(*container)
-		// Enter()
+		// Hamndle if only a pod is given
+		if *containerName != "" {
+			Enter(*podName, *containerName)
+		} else {
+			Enter(*podName, *podName)
+		}
 
 	case supercede.FullCommand():
 
