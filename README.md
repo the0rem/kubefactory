@@ -188,21 +188,21 @@ Disable and remove a link.
 ## Installing a CoreOS Kubernetes cluster
 https://github.com/GoogleCloudPlatform/kubernetes/tree/master/docs/getting-started-guides
 
-  ### OpenStack
-  https://github.com/GoogleCloudPlatform/kubernetes/blob/master/docs/getting-started-guides/juju.md
+### OpenStack
+https://github.com/GoogleCloudPlatform/kubernetes/blob/master/docs/getting-started-guides/juju.md
 
-  ### AWS
-  https://github.com/GoogleCloudPlatform/kubernetes/blob/master/docs/getting-started-guides/aws-coreos.md
+### AWS
+https://github.com/GoogleCloudPlatform/kubernetes/blob/master/docs/getting-started-guides/aws-coreos.md
 
-  ### Azure
-  https://github.com/GoogleCloudPlatform/kubernetes/blob/master/docs/getting-started-guides/azure.md
+### Azure
+https://github.com/GoogleCloudPlatform/kubernetes/blob/master/docs/getting-started-guides/azure.md
 
-  ### Juju
-  https://github.com/GoogleCloudPlatform/kubernetes/blob/master/docs/getting-started-guides/juju.md
+### Juju
+https://github.com/GoogleCloudPlatform/kubernetes/blob/master/docs/getting-started-guides/juju.md
 
-  ### Vagrant
-  https://github.com/GoogleCloudPlatform/kubernetes/blob/master/docs/getting-started-guides/vagrant.md
-  https://github.com/pires/kubernetes-vagrant-coreos-cluster
+### Vagrant
+https://github.com/GoogleCloudPlatform/kubernetes/blob/master/docs/getting-started-guides/vagrant.md
+https://github.com/pires/kubernetes-vagrant-coreos-cluster
 
 
 ## Generating templates
