@@ -10,12 +10,18 @@ import os
 import sys
 import argparse
 import yaml
+import time
+import datetime
 
 """
 Handles splicing YAML files
 """
 class YAMLThingy(object):
   def __init__(self, templatefile, marker, environmentPath):
+
+    # Create timestamp to inject for template identifier
+    ts = time.time()
+    timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 
     outputfile = '%s.tmp' % templatefile
     self._tf = file(templatefile, 'r')
@@ -43,36 +49,51 @@ class YAMLThingy(object):
       if envMatch is not None:
         found = True
 
-        # Check for environment file specified
-        environmentFilename =  '%s%s.yaml' % (environmentPath, envMatch.group(1))
-        try:
-          self._cf = file(environmentFilename, 'r')
-        except IOError, exc: 
-          print "Could not find environment file %s" % environmentFilename
-          continue
+        print "Match is %s" % envMatch.group(1)
 
-        try:
-          yaml.load(self._cf)
-        except yaml.YAMLError, exc:
-          print "Could not parse environment file %s" % environmentFilename
-          if hasattr(exc, 'problem_mark'):
-            mark = exc.problem_mark
-            print "Error position: (%s:%s)" % (mark.line + 1, mark.column + 1)
-          sys.exit(1)
-        print "environment file %s is validated." % environmentFilename
-
-        # Match indents for valid YAML file
-        indent = ''
-        indentmatch = re.match('(\s+)', line)
-        
-        if indentmatch is not None:
-          indent = indentmatch.group(0)
-        self._cf.seek(0)
-        
-
-        for contentline in self._cf.readlines():
-          newline = '%s  %s' % (indent, contentline)
+        if envMatch.group(1) == 'timestamp':
+          
+          # Match indents for valid YAML file
+          indent = ''
+          indentmatch = re.match('(\s+)', line)
+          
+          if indentmatch is not None:
+            indent = indentmatch.group(0)
+          
+          newline = '%s  "%s"\n' % (indent, timestamp)
           self._of.write(newline)
+
+        else:
+          # Check for environment file specified
+          environmentFilename =  '%s%s.yaml' % (environmentPath, envMatch.group(1))
+          try:
+            self._cf = file(environmentFilename, 'r')
+          except IOError, exc: 
+            print "Could not find environment file %s" % environmentFilename
+            continue
+
+          try:
+            yaml.load(self._cf)
+          except yaml.YAMLError, exc:
+            print "Could not parse environment file %s" % environmentFilename
+            if hasattr(exc, 'problem_mark'):
+              mark = exc.problem_mark
+              print "Error position: (%s:%s)" % (mark.line + 1, mark.column + 1)
+            sys.exit(1)
+          print "environment file %s is validated." % environmentFilename
+
+          # Match indents for valid YAML file
+          indent = ''
+          indentmatch = re.match('(\s+)', line)
+          
+          if indentmatch is not None:
+            indent = indentmatch.group(0)
+          self._cf.seek(0)
+          
+
+          for contentline in self._cf.readlines():
+            newline = '%s  %s' % (indent, contentline)
+            self._of.write(newline)
     
     self._of.close()
 
