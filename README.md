@@ -11,7 +11,6 @@ for generating templates, launching into containers and remote folder synchronis
  - [ ] Enter containers
  - [ ] Finalise environment variables for kubectl integration
  - [ ] Write Docs
- - [ ] Kill resources handler
 
 
 ## Usage

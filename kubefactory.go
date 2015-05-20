@@ -5,6 +5,8 @@ running on kubernetes. It works closely with kubectl, kubernetes' CLI utility to
 managing templates easier, while enabling deployment to different environments a breeze. Extra tools
 for generating templates, launching into containers and remote folder synchronisation are also included.
 
+This app is used to enhance certain features of kubectl, not replace them.
+
 */
 package main
 
@@ -26,9 +28,10 @@ var (
 	debug       = app.Flag("debug", "Enable debug mode.").Bool()
 	appTest     = app.Flag("dryrun", "Take it for a test drive first.").Bool()
 	environment = app.Flag("environment", "Environment to control. Default 'dev'").Default("dev").String()
-	envFile     = app.Flag("envFile", "Environment file for connecting to kubernetes. (Default: "+filePath+"/.kfenv_dev)").Default(filePath + "/.kfenv_dev").String()
-	fleetctl    = app.Flag("fleetctl-endpoint", "Enpoint for fleetctl.").OverrideDefaultFromEnvar("FLEETCTL_ENDPOINT").URL()
-	kubernetes  = app.Flag("kubernetes-master", "Enpoint for kubernetes.").OverrideDefaultFromEnvar("KUBERNETES_MASTER").URL()
+	envFile     = app.Flag("envFile", "Environment file for connecting to kubernetes relative to the environment-specific directory. (Default: .kfenv)").Default("/.kfenv").String()
+	envDir      = app.Flag("envDir", "Root directory for environment directories").Default(filePath + "/environments/").String()
+	// fleetctl    = app.Flag("fleetctl-endpoint", "Enpoint for fleetctl.").OverrideDefaultFromEnvar("FLEETCTL_ENDPOINT").URL()
+	// kubernetes  = app.Flag("kubernetes-master", "Enpoint for kubernetes.").OverrideDefaultFromEnvar("KUBERNETES_MASTER").URL()
 
 	/**
 	 * Add command to handle generating templates
@@ -39,7 +42,6 @@ var (
 	 * Add command to handle building deployment files from templates
 	 */
 	build          = app.Command("build", "Configure a new deployment from template files.")
-	envDir         = build.Arg("envDir", "Root directory for environment directories").Default(filePath + "/environments/").String()
 	templateSource = build.Arg("templateSource", "Source directory for YAML deployment templates").Default(filePath + "/templates/").String()
 	buildDest      = build.Arg("buildDest", "Destination directory for saving generated distribution files").Default(filePath + "/dist/").String()
 
@@ -60,16 +62,10 @@ var (
 	/**
 	 * Add command to scale up new container versions while scaling down old versions
 	 */
-	supercede = app.Command("supercede", "Deploy by scaling down old and scaling up new.")
-	old       = supercede.Arg("old", "Name of resource to kill.").Required().String()
-	rise      = supercede.Arg("new", "Name of resource to rise up.").Required().String()
-	speed     = supercede.Arg("interval", "Time between kills.").Required().Int()
-
-	/**
-	 * Add command to kill specific resources
-	 */
-	kill    = app.Command("kill", "Take down pods resource controllers and services.")
-	targets = kill.Arg("targets", "Name of resources to kill.").Required().Strings()
+	upgrade         = app.Command("upgrade", "Deploy by scaling down old and scaling up new. Replaces the specified controller with new controller, updating one pod at a time to use the new PodTemplate. The new-controller.yaml must specify the same namespace as the existing controller and overwrite at least one (common) label in its replicaSelector.")
+	currentRC       = upgrade.Arg("old", "Name of resource controller to update.").Required().String()
+	newRC           = upgrade.Arg("new", "Filename of new resource controller to upgrade to.").Required().String()
+	upgradeInterval = upgrade.Arg("interval", "Time between updates.").Required().String()
 
 	/**
 	 * Add command to handle synchronisation between local folders and remote folders
@@ -112,7 +108,7 @@ func main() {
 
 		deployment := new(launchParams)
 
-		deployment.Configure(*launchSrc, *envFile+*environment)
+		deployment.Configure(*launchSrc, *envFile, *envDir+*environment+"/"+*envFile)
 		deployment.Launch()
 
 	case enter.FullCommand():
@@ -124,15 +120,9 @@ func main() {
 			Enter(*podName, *podName)
 		}
 
-	case supercede.FullCommand():
+	case upgrade.FullCommand():
 
-		println((*supercede).FullCommand())
-		// Supercede()
-
-	case kill.FullCommand():
-
-		println((*kill).FullCommand())
-		// Kill([]string{"rc1","service1"})
+		Upgrade(*currentRC, *newRC, *upgradeInterval)
 
 	case (*linkList).FullCommand():
 
