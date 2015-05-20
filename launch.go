@@ -3,9 +3,12 @@ package main
 import (
 	"github.com/codeskyblue/go-sh"
 	"github.com/fatih/color"
+	"path/filepath"
 	// "github.com/joho/godotenv/autoload"
+	"fmt"
 	"github.com/joho/godotenv"
 	"io/ioutil"
+	"os"
 )
 
 type launchParams struct {
@@ -15,11 +18,11 @@ type launchParams struct {
 	sourceFilePrefix string
 }
 
-func (params *launchParams) Configure(distDir, environment string) {
+func (params *launchParams) Configure(distDir, environment, envFile string) {
 
 	params.distDir = distDir
 	params.environment = environment
-	params.envFile = ".kfenv_" + environment
+	params.envFile = envFile
 
 }
 
@@ -32,32 +35,68 @@ func (params *launchParams) Launch() {
 
 	// Check for error finding files
 	if err != nil {
-
+		color.Red(fmt.Sprintf("%s", err))
 	}
 
 	// Get env variables
 	err = godotenv.Load(params.envFile)
 
 	if err != nil {
-
+		color.Red(fmt.Sprintf("%s", err))
 	}
 
-	// Create a session
-	session := sh.NewSession()
+	params.LaunchTemplatesFromFolder(files, "")
+
+	// Output status of machine
+	msg, err = sh.Command("kubectl", "cluster-info").Output()
+	color.Green("Cluster Info")
+	color.White(string(msg[:]))
+
+	msg, err = sh.Command("kubectl", "get", "minions").Output()
+	color.Green("Minions")
+	color.White(string(msg[:]))
+
+	msg, err = sh.Command("kubectl", "get", "services").Output()
+	color.Green("Services")
+	color.White(string(msg[:]))
+
+	msg, err = sh.Command("kubectl", "get", "replicationcontrollers").Output()
+	color.Green("Replication Controllers")
+	color.White(string(msg[:]))
+
+	msg, err = sh.Command("kubectl", "get", "pods").Output()
+	color.Green("Pods")
+	color.White(string(msg[:]))
+
+}
+
+func (params *launchParams) LaunchTemplatesFromFolder(files []os.FileInfo, subDir string) {
 
 	// Deploy generated template files to kubernetes endpoint
-	for _, value := range files {
+	for _, file := range files {
 
-		if value.IsDir() {
+		filename := params.distDir + subDir + file.Name()
+		// If file is dir, recurse function
+		if file.IsDir() {
+
+			buildFiles, _ := ioutil.ReadDir(params.distDir + subDir + file.Name())
+			params.LaunchTemplatesFromFolder(buildFiles, "/"+file.Name())
 			continue
+
 		}
 
-		// TODO: add correct env files
-		filename := params.distDir + value.Name()
-		msg, err = session.Command("kubectl", "--kubeconfig=params.envFile", "create", "-f", filename).Output()
+		if filepath.Ext(file.Name()) != ".yaml" {
+
+			color.Yellow(fmt.Sprintf("File %s is not a template", filename))
+			continue
+
+		}
+
+		// Run create command on specified server
+		msg, err := sh.Command("kubectl", "--insecure-skip-tls-verify", os.Getenv("LINK_INSECURE_SKIP_TLS_VERIFY"), "--username", os.Getenv("LINK_USERNAME"), "--password", os.Getenv("LINK_PASSWORD"), "--server", os.Getenv("LINK_SERVER"), "create", "-f", filename).Output()
 
 		if err != nil {
-
+			color.Red(fmt.Sprintf("%s", err))
 		}
 
 		output := string(msg[:])
@@ -66,109 +105,4 @@ func (params *launchParams) Launch() {
 
 	}
 
-	// Output status of machine
-	msg, err = session.Command("kubectl", "cluster-info").Output()
-	msg, err = session.Command("kubectl", "get", "minions").Output()
-	msg, err = session.Command("kubectl", "get", "services").Output()
-	msg, err = session.Command("kubectl", "get", "replicationcontrollers").Output()
-	msg, err = session.Command("kubectl", "get", "pods").Output()
-
 }
-
-/*
-# Parse arguments
-usage() {
-    echo "Usage: $0 [-h] [-v] -e ENV"
-    echo "  -h --help  Help. Display this message and quit."
-    echo "  -v --version Version. Print version number and quit."
-    echo "  -d --dir Specify the distribution directory."
-    echo "  -e --env Specify configuration file FILE."
-    echo "  -u --update Whether to update a current deployment"
-    exit
-}
-
-distDir="${PWD}/dist"
-environment="dev"
-envFile=""
-sourceFilePrefix=".kubectl_"
-
-update=0
-deployDelay=10
-
-while (( $# > 0 ))
-do
-    option="$1"
-    shift
-
-    case $option in
-    -h|--help)
-        usage
-        exit 0
-        ;;
-    -v|--version)
-        echo "$0 version $version"
-        exit 0
-        ;;
-    -e|--env)  # Example with an operand
-        environment="$1"
-        shift
-        ;;
-    -d|--dir)  # Example with an operand
-        distDir="$1"
-        shift
-        ;;
-    -u|--update)  # Example with an operand
-        update=1
-        ;;
-    -*)
-        echo "Invalid option: '$opt'" >&2
-        exit 1
-        ;;
-    *)
-        # end of long options
-        break;
-        ;;
-   esac
-
-done
-
-if [ ! $envFile ]; then
-    envFile=${sourceFilePrefix}${environment}
-fi
-
-if [ ! -f $envFile ]; then
-    echo "Environment file '$envFile' cannot be sourced" >&2
-    exit 1
-fi
-
-source $envFile
-
-# We only want to update
-if [ $update -eq 1 ]; then
-    for file in $distDir/*.yaml; do
-
-        isReplicationController=$(grep 'kind: ReplicationController' $file)
-
-        if [ -z $isReplicationController ]; then
-            # Runs a graceful update of the deployed applicaiton
-            kubectl rolling-update "$deploymentName" --update-period="$deployDelay"s -f "$newDeploymentFile"
-        fi
-
-    done
-else
-
-    # Build tempaltes using environmental variables
-    for file in $distDir/*.yaml; do
-
-        kubectl create -f $file
-        echo "Creating $file"
-
-    done
-fi
-
-kubectl cluster-info
-kubectl get minions
-kubectl get services
-kubectl get replicationcontrollers
-kubectl get pods
-*/
