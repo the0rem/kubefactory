@@ -76,17 +76,46 @@ func (build *builder) Configure(destination, templateSource, envSource string) {
  */
 func (build *builder) Build() {
 
-	yaml := ".yaml"
 	color.White("Checking for template files")
 
 	// Set variables to point to folders
 	templateFiles, _ := ioutil.ReadDir(build.templateSource)
+	envFiles, _ := ioutil.ReadDir(build.envSource)
+
+	build.BuildTemplatesFromFolder(templateFiles, "")
+	build.BuildTemplatesFromFolder(envFiles, "")
+
+}
+
+/**
+ * [func description]
+ * @param  {[type]} build *builder)     func BuildTemplatesFromFolder(templateFiles []os.FileInfo [description]
+ * @return {[type]}       [description]
+ */
+func (build *builder) BuildTemplatesFromFolder(templateFiles []os.FileInfo, subDir string) {
 
 	// Loop through template files for processing
 	for _, file := range templateFiles {
 
-		// If file is a .yaml send for processing
-		if file.IsDir() || filepath.Ext(file.Name()) != yaml {
+		// If file is dir, recurse function
+		if file.IsDir() {
+
+			// Create the directory
+			err = os.MkdirAll(build.destination+subDir+file.Name(), 0755)
+
+			if err != nil {
+				color.Red(fmt.Sprintf("Could not create directory '%s'", build.destination+subDir+file.Name()))
+				os.Exit(1)
+			}
+
+			templateFiles, _ := ioutil.ReadDir(build.templateSource + subDir + file.Name())
+			build.BuildTemplatesFromFolder(templateFiles, "/"+file.Name())
+			continue
+
+		}
+
+		// Skip if file is not a .yaml
+		if filepath.Ext(file.Name()) != ".yaml" {
 
 			color.Yellow(fmt.Sprintf("File %s is not a template", file.Name()))
 			continue
@@ -116,6 +145,7 @@ func (build *builder) Build() {
 		color.White(fmt.Sprintf("%s", parseResult))
 
 	}
+
 }
 
 /**
@@ -125,7 +155,7 @@ func (build *builder) Build() {
  */
 func (build *builder) ParseTemplate(filename string) (output string, err error) {
 
-	msg, err := sh.Command("python2.7", "yamlthingy.py", "--templatefile", filename, "--marker", "([a-zA-Z0-9-_]+):\\s#\\1#", "--envdir", build.envSource).Output()
+	msg, err := sh.Command("python2.7", "yamlthingy.py", "--templatefile", filename, "--marker", "[a-zA-Z0-9-_]+:\\s#(.*)#", "--envdir", build.envSource).Output()
 
 	// Convert byte array to string
 	output = string(msg[:])
