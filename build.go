@@ -82,8 +82,8 @@ func (build *builder) Build() {
 	templateFiles, _ := ioutil.ReadDir(build.templateSource)
 	envFiles, _ := ioutil.ReadDir(build.envSource)
 
-	build.BuildTemplatesFromFolder(templateFiles, "")
-	build.BuildTemplatesFromFolder(envFiles, "")
+	build.BuildTemplatesFromFolder(templateFiles, build.templateSource, "")
+	build.BuildTemplatesFromFolder(envFiles, build.envSource, "")
 
 }
 
@@ -92,7 +92,7 @@ func (build *builder) Build() {
  * @param  {[type]} build *builder)     func BuildTemplatesFromFolder(templateFiles []os.FileInfo [description]
  * @return {[type]}       [description]
  */
-func (build *builder) BuildTemplatesFromFolder(templateFiles []os.FileInfo, subDir string) {
+func (build *builder) BuildTemplatesFromFolder(templateFiles []os.FileInfo, baseDir, subDir string) {
 
 	// Loop through template files for processing
 	for _, file := range templateFiles {
@@ -108,8 +108,8 @@ func (build *builder) BuildTemplatesFromFolder(templateFiles []os.FileInfo, subD
 				os.Exit(1)
 			}
 
-			templateFiles, _ := ioutil.ReadDir(build.templateSource + subDir + file.Name())
-			build.BuildTemplatesFromFolder(templateFiles, "/"+file.Name())
+			templateFiles, _ := ioutil.ReadDir(baseDir + subDir + file.Name())
+			build.BuildTemplatesFromFolder(templateFiles, baseDir, "/"+file.Name())
 			continue
 
 		}
@@ -123,7 +123,7 @@ func (build *builder) BuildTemplatesFromFolder(templateFiles []os.FileInfo, subD
 		}
 
 		// Copy template file to dist
-		filename := build.templateSource + file.Name()
+		filename := baseDir + subDir + file.Name()
 		distFilename := build.destination + file.Name()
 		// err := CopyFile(filename, build.destination)
 		msg, err := sh.Command("cp", "-rfv", filename, build.destination).Output()
