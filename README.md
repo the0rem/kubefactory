@@ -5,6 +5,10 @@ running on kubernetes. It works closely with kubectl, kubernetes' CLI utility to
 managing templates easier, while enabling deployment to different environments a breeze. Extra tools
 for generating templates, launching into containers and remote folder synchronisation are also included.
 
+This package aims to solve the logistics around deploying your applications to different environments. By integrating environmental dependencies into packages, you can use the same template bases to deploy for all cycles through development to production.
+
+
+
 ## TODO
 
  - [ ] Launch built templates
@@ -61,6 +65,8 @@ Google kubernetes provides a comprehensive templating system for provisioning yo
 Example templates - https://github.com/GoogleCloudPlatform/kubernetes/tree/master/examples
 Template specifications - https://godoc.org/github.com/GoogleCloudPlatform/kubernetes/pkg/api/v1beta3
 
+The template specifications are the best place for understanding how templates can be built however there is an initial learning curve if you're not familiar with the documentation style.
+
 #### Building template tailored to your environment
 
 To have your templates coordinate with environmental differences you will need to have the following:
@@ -69,7 +75,6 @@ To have your templates coordinate with environmental differences you will need t
  - 2. An environment file to inject into the templates
 
 This will allow you to state when a template (an environmental template) should be injected into another template (your base template) when required. From here you can define which environment you would like to build for and it will handle the "mixing" of your template files.
-
 
 
 You're going to need to build for different environments right? Of course! This tool wil help inject the dependencies of each build environment iwth the data that is required. This could be the dev files for the docker containers, diffferent folder mounts, whatever you wants, just append any section of your templates with keyName: #keyName# and kubefactory will track down the yaml file to inject for each environment. This must be in your /environments folder for the environment that you have selected
@@ -119,7 +124,11 @@ Open an interactive terminal within a container. This is useful for gaining acce
 
 ### Upgrade
 
-Deploy by scaling down old and scaling up new.
+This tool will handle pushing out deployment updates of pods under replication controllers. It is an overlay of kubectl rolling-update which uses timestamps as metadata in the build command to handle identifying new template deployments.
+
+This is a simple process to identify a change in the state of the containers.
+
+The goal is to eventually use the docker commit hash
 
 ```
   kubefactory upgrade <old> <new> <interval>
