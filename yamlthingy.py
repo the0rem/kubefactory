@@ -53,6 +53,8 @@ class YAMLThingy(object):
 
         if envMatch.group(1) == 'timestamp':
           
+          print "Attaching timestamp to property"
+
           # Match indents for valid YAML file
           indent = ''
           indentmatch = re.match('(\s+)', line)
