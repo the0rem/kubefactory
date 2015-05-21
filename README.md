@@ -99,6 +99,8 @@ This can be acheived by identifying where environment dependencies should be inj
     [<buildDest>]       Destination directory for saving generated distribution files
 ```
 
+![Injecting Environmental Dependencies](https://github.com/the0rem/kubefactory/docs/images/environment-inject.png)
+
 ### Launch 
 
 Launch templates in an environment.
