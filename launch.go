@@ -1,14 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"github.com/codeskyblue/go-sh"
 	"github.com/fatih/color"
-	"path/filepath"
-	// "github.com/joho/godotenv/autoload"
-	"fmt"
 	"github.com/joho/godotenv"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 type launchParams struct {
@@ -48,23 +47,23 @@ func (params *launchParams) Launch() {
 	params.LaunchTemplatesFromFolder(files, "")
 
 	// Output status of machine
-	msg, err = sh.Command("kubectl", "cluster-info").Output()
+	msg, err = sh.Command("kubectl", "--insecure-skip-tls-verify="+os.Getenv("LINK_INSECURE_SKIP_TLS_VERIFY"), "--username="+os.Getenv("LINK_USERNAME"), "--password="+os.Getenv("LINK_PASSWORD"), "--server="+os.Getenv("LINK_SERVER"), "cluster-info").Output()
 	color.Green("Cluster Info")
 	color.White(string(msg[:]))
 
-	msg, err = sh.Command("kubectl", "get", "minions").Output()
+	msg, err = sh.Command("kubectl", "--insecure-skip-tls-verify="+os.Getenv("LINK_INSECURE_SKIP_TLS_VERIFY"), "--username="+os.Getenv("LINK_USERNAME"), "--password="+os.Getenv("LINK_PASSWORD"), "--server="+os.Getenv("LINK_SERVER"), "get", "minions").Output()
 	color.Green("Minions")
 	color.White(string(msg[:]))
 
-	msg, err = sh.Command("kubectl", "get", "services").Output()
+	msg, err = sh.Command("kubectl", "--insecure-skip-tls-verify="+os.Getenv("LINK_INSECURE_SKIP_TLS_VERIFY"), "--username="+os.Getenv("LINK_USERNAME"), "--password="+os.Getenv("LINK_PASSWORD"), "--server="+os.Getenv("LINK_SERVER"), "get", "services").Output()
 	color.Green("Services")
 	color.White(string(msg[:]))
 
-	msg, err = sh.Command("kubectl", "get", "replicationcontrollers").Output()
+	msg, err = sh.Command("kubectl", "--insecure-skip-tls-verify="+os.Getenv("LINK_INSECURE_SKIP_TLS_VERIFY"), "--username="+os.Getenv("LINK_USERNAME"), "--password="+os.Getenv("LINK_PASSWORD"), "--server="+os.Getenv("LINK_SERVER"), "get", "replicationcontrollers").Output()
 	color.Green("Replication Controllers")
 	color.White(string(msg[:]))
 
-	msg, err = sh.Command("kubectl", "get", "pods").Output()
+	msg, err = sh.Command("kubectl", "--insecure-skip-tls-verify="+os.Getenv("LINK_INSECURE_SKIP_TLS_VERIFY"), "--username="+os.Getenv("LINK_USERNAME"), "--password="+os.Getenv("LINK_PASSWORD"), "--server="+os.Getenv("LINK_SERVER"), "get", "pods").Output()
 	color.Green("Pods")
 	color.White(string(msg[:]))
 
@@ -93,7 +92,7 @@ func (params *launchParams) LaunchTemplatesFromFolder(files []os.FileInfo, subDi
 		}
 
 		// Run create command on specified server
-		msg, err := sh.Command("kubectl", "--insecure-skip-tls-verify", os.Getenv("LINK_INSECURE_SKIP_TLS_VERIFY"), "--username", os.Getenv("LINK_USERNAME"), "--password", os.Getenv("LINK_PASSWORD"), "--server", os.Getenv("LINK_SERVER"), "create", "-f", filename).Output()
+		msg, err := sh.Command("kubectl", "--insecure-skip-tls-verify="+os.Getenv("LINK_INSECURE_SKIP_TLS_VERIFY"), "--username="+os.Getenv("LINK_USERNAME"), "--password="+os.Getenv("LINK_PASSWORD"), "--server="+os.Getenv("LINK_SERVER"), "create", "-f", filename).Output()
 
 		if err != nil {
 			color.Red(fmt.Sprintf("%s", err))
