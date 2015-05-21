@@ -11,6 +11,9 @@ for generating templates, launching into containers and remote folder synchronis
  - [ ] Enter containers
  - [ ] Finalise environment variables for kubectl integration
  - [ ] Write Docs
+ - [ ] Add auto vhost configuration for added services (Event based on health via metadata)
+ - [ ] Add Dockerfile build management
+
 
 
 ## Usage
@@ -45,12 +48,11 @@ Show help for a command.
 
 ### Generate TODO
 
-Generate a new deployment template.
-
+This will handle genation of deployment templates. The feature will involve an interactive command line to build a template based on the answers given. The features will be basic to begin with (simple pods, services, rcs) with metadata.
 
 ### Build 
 
-Builds a distribution release of your deployment using your deployment templates along with your environmental files.
+Builds an environment-specific release of your deployment using your deployment templates along with your environmental files.
 
 #### Writing templates
 
@@ -61,21 +63,27 @@ Template specifications - https://godoc.org/github.com/GoogleCloudPlatform/kuber
 
 #### Building template tailored to your environment
 
+To have your templates coordinate with environmental differences you will need to have the following:
+
+ - 1. A reference in the template to inject another template file
+ - 2. An environment file to inject into the templates
+
+This will allow you to state when a template (an environmental template) should be injected into another template (your base template) when required. From here you can define which environment you would like to build for and it will handle the "mixing" of your template files.
+
+
+
 You're going to need to build for different environments right? Of course! This tool wil help inject the dependencies of each build environment iwth the data that is required. This could be the dev files for the docker containers, diffferent folder mounts, whatever you wants, just append any section of your templates with keyName: #keyName# and kubefactory will track down the yaml file to inject for each environment. This must be in your /environments folder for the environment that you have selected
 
 #### Configuring environmental dependencies into templates
 
-One thing that this system doesn't cater for is the changes which need to be made depending on the deployment enironment. For example, you may wish to pass different environment variables, set different IP addresses, replication sizes, or pass a folder mount for development only. 
+One thing that the kubernetes system doesn't cater for is the changes which need to be made depending on the deployment enironment. For example, you may wish to pass different environment variables, set different IP addresses, replication sizes, or pass a folder mount for development only. 
 
-This can be acheived by identifying where environment dependencies should be injected.
-
+This can be acheived by identifying where environment dependencies should be injected. Once you can do this, you can then add the environment variables for your environment
 
 
 ```
- - string: #string#
+ - parameter: #environmentFilename#
 ```
-
-
 
 ```
   kubefactory build [<envDir> [<templateSource> [<buildDest>]]]
@@ -109,20 +117,12 @@ Open an interactive terminal within a container. This is useful for gaining acce
     [<containerName>]  Name of container to enter. We're smart enough to figure out which one, so give us the start of the name. If it's the same as the pod, you don't need to add the container.
 ```
 
-### Supercede TODO
+### Upgrade
 
 Deploy by scaling down old and scaling up new.
 
 ```
-  kubefactory supercede <old> <new> <interval>
-```
-
-### Kill TODO
-
-Take down pods resource controllers and services.
-
-```
-  kubefactory kill <targets>
+  kubefactory upgrade <old> <new> <interval>
 ```
 
 ## Links 
@@ -204,9 +204,6 @@ https://github.com/GoogleCloudPlatform/kubernetes/blob/master/docs/getting-start
 https://github.com/pires/kubernetes-vagrant-coreos-cluster
 
 
-## Generating templates
-
-If you don't know how to reate your own template files, this is the tool to use. An interactive template generator which will help you create your build environment without any knowlegde required in Go
 
 
 
