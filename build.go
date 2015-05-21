@@ -14,6 +14,7 @@ type builder struct {
 	destination    string
 	templateSource string
 	envSource      string
+	ignoreDirs     []string
 }
 
 /**
@@ -22,6 +23,8 @@ type builder struct {
  * @return {[type]}       [description]
  */
 func (build *builder) Configure(destination, templateSource, envSource string) {
+
+	build.ignoreDirs = append(build.ignoreDirs, "partials")
 
 	// Ensure all required directory entries exist
 	directories := []string{destination, templateSource, envSource}
@@ -94,11 +97,18 @@ func (build *builder) Build() {
  */
 func (build *builder) BuildTemplatesFromFolder(templateFiles []os.FileInfo, baseDir, subDir string) {
 
+fileLoop:
 	// Loop through template files for processing
 	for _, file := range templateFiles {
 
 		// If file is dir, recurse function
 		if file.IsDir() {
+
+			for _, ignore := range build.ignoreDirs {
+				if file.Name() == ignore {
+					continue fileLoop
+				}
+			}
 
 			// Create the directory
 			err = os.MkdirAll(build.destination+subDir+file.Name(), 0755)
@@ -155,7 +165,7 @@ func (build *builder) BuildTemplatesFromFolder(templateFiles []os.FileInfo, base
  */
 func (build *builder) ParseTemplate(filename string) (output string, err error) {
 
-	msg, err := sh.Command("python2.7", "yamlthingy.py", "--templatefile", filename, "--marker", "[a-zA-Z0-9-_]+:\\s#(.*)#", "--envdir", build.envSource).Output()
+	msg, err := sh.Command("python2.7", "yamlthingy.py", "--templatefile", filename, "--marker", "[a-zA-Z0-9-_]+:\\s#(.*)#", "--envdir", build.envSource+"partials/").Output()
 
 	// Convert byte array to string
 	output = string(msg[:])
