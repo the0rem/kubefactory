@@ -36,7 +36,7 @@ var (
 	/**
 	 * Add command to handle generating templates
 	 */
-	generate = app.Command("generate", "Generate a new deployment template.")
+	// generate = app.Command("generate", "Generate a new deployment template.")
 
 	/**
 	 * Add command to handle building deployment files from templates
@@ -93,10 +93,10 @@ func main() {
 
 	switch result {
 
-	case generate.FullCommand():
+	// case generate.FullCommand():
 
-		println((*generate).FullCommand())
-		// Generate()
+	// 	println((*generate).FullCommand())
+	// 	Generate()
 
 	case build.FullCommand():
 
