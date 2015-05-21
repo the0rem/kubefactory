@@ -101,7 +101,7 @@ func main() {
 	case build.FullCommand():
 
 		builder := new(builder)
-		builder.Configure(*buildDest, *templateSource, *envDir+*environment+"/partials/")
+		builder.Configure(*buildDest, *templateSource, *envDir+*environment+"/")
 		builder.Build()
 
 	case launch.FullCommand():
@@ -115,9 +115,9 @@ func main() {
 
 		// Hamndle if only a pod is given
 		if *containerName != "" {
-			Enter(*podName, *containerName)
+			Enter(*podName, *containerName, *envDir+*environment+"/"+*envFile)
 		} else {
-			Enter(*podName, *podName)
+			Enter(*podName, *podName, *envDir+*environment+"/"+*envFile)
 		}
 
 	case upgrade.FullCommand():

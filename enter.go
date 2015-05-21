@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/codeskyblue/go-sh"
 	"github.com/fatih/color"
+	"github.com/joho/godotenv"
 	"os"
 	"os/exec"
 	"strconv"
@@ -17,22 +18,31 @@ import (
  * @param {string} pod
  * @param {string} container
  */
-func Enter(pod, container string) {
+func Enter(pod, container, envFile string) {
 
 	var podName string
 	var containerName string
+	var podIndex int
+	var containerIndex int
+
+	// Get env variables
+	err = godotenv.Load(envFile)
+
+	if err != nil {
+		color.Red(fmt.Sprintf("%s", err))
+	}
 
 	// Look for pods starting with the given string
 	// TODO: Test what field awk needs to get from each line
-	msg, err := sh.Command("kubectl", "get", "pods").Command("grep", pod).Output()
+	msg, err := sh.Command("kubectl", "--insecure-skip-tls-verify="+os.Getenv("LINK_INSECURE_SKIP_TLS_VERIFY"), "--username="+os.Getenv("LINK_USERNAME"), "--password="+os.Getenv("LINK_PASSWORD"), "--server="+os.Getenv("LINK_SERVER"), "get", "pods").Command("grep", pod).Output()
 
 	if err != nil {
-		color.Red("Couldn't find the given pod")
+		color.Red(fmt.Sprintf("Couldn't find the given pod %s", err))
 		os.Exit(1)
 	}
 
 	// Break up results based on spaces
-	pods := strings.Split(string(msg[:]), " ")
+	pods := strings.Split(string(msg[:]), "\n")
 
 	/// If multiple pods are found, ask the user which one
 	if len(pods) > 1 {
@@ -52,27 +62,16 @@ func Enter(pod, container string) {
 			os.Exit(1)
 		}
 
-		podIndex, _ := strconv.Atoi(input)
-		podName = pods[podIndex]
-
-	} else {
-
-		/// If only one pod is found, save it
-		podName = pods[0]
+		podIndex, _ = strconv.Atoi(input)
 
 	}
 
-	// Look for containers in the pod within the given pod
-	// TODO: Test what field awk needs to get from each line
-	msg, err = sh.Command("kubectl", "get", "containers").Command("grep", podName).Command("grep", container).Output()
+	podFields := strings.Fields(pods[podIndex])
 
-	if err != nil {
-		color.Red("Couldn't find the given controller")
-		os.Exit(1)
-	}
+	podName = podFields[0]
 
-	// Break up results based on spaces
-	containers := strings.Split(string(msg[:]), " ")
+	// Break up results based on commas
+	containers := strings.Split(podFields[2], ",")
 
 	// If multiple containers are found, ask the user which one
 	if len(containers) > 1 {
@@ -92,15 +91,13 @@ func Enter(pod, container string) {
 			os.Exit(1)
 		}
 
-		containerIndex, _ := strconv.Atoi(input)
-		containerName = containers[containerIndex]
-
-	} else {
-
-		// If only one container is found, save it
-		containerName = containers[0]
+		containerIndex, _ = strconv.Atoi(input)
 
 	}
+
+	containerName = containers[containerIndex]
+
+	color.White(fmt.Sprintf("Set pod as: %s, container as %s", podName, containerName))
 
 	// Get the absolute path to command
 	binary, lookErr := exec.LookPath("kubectl")
@@ -110,7 +107,7 @@ func Enter(pod, container string) {
 	}
 
 	// Set arguments for an interactive bash terminal
-	args := []string{"exec", "-c", containerName, "-p", podName, "-i", "-t", "--", "bash", "-il"}
+	args := []string{"--insecure-skip-tls-verify=" + os.Getenv("LINK_INSECURE_SKIP_TLS_VERIFY"), "--username=" + os.Getenv("LINK_USERNAME"), "--password=" + os.Getenv("LINK_PASSWORD"), "--server=" + os.Getenv("LINK_SERVER"), "exec", "-c", containerName, "-p", podName, "-i", "-t", "--", "bash", "-il"}
 
 	// Add environment variables
 	env := os.Environ()

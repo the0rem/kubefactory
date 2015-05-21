@@ -11,13 +11,9 @@ This package aims to solve the logistics around deploying your applications to d
 
 ## TODO
 
- - [ ] Launch built templates
- - [ ] Enter containers
+ - [X] Launch built templates
+ - [X] Enter containers
  - [ ] Finalise environment variables for kubectl integration
- - [ ] Write Docs
- - [ ] Add auto vhost configuration for added services (Event based on health via metadata)
- - [ ] Add Dockerfile build management
-
 
 
 ## Usage
@@ -58,6 +54,15 @@ This will handle genation of deployment templates. The feature will involve an i
 
 Builds an environment-specific release of your deployment using your deployment templates along with your environmental files.
 
+```
+  kubefactory build [<envDir> [<templateSource> [<buildDest>]]]
+
+  Args:
+    [<envDir>]          Root directory for environment directories
+    [<templateSource>]  Source directory for YAML deployment templates
+    [<buildDest>]       Destination directory for saving generated distribution files
+```
+
 #### Writing templates
 
 Google kubernetes provides a comprehensive templating system for provisioning your resources on the cloud. The following docs will help you get started writing template files for kubernetes
@@ -88,15 +93,6 @@ This can be acheived by identifying where environment dependencies should be inj
 
 ```
  - parameter: #environmentFilename#
-```
-
-```
-  kubefactory build [<envDir> [<templateSource> [<buildDest>]]]
-
-  Args:
-    [<envDir>]          Root directory for environment directories
-    [<templateSource>]  Source directory for YAML deployment templates
-    [<buildDest>]       Destination directory for saving generated distribution files
 ```
 
 ![Injecting Environmental Dependencies](https://raw.githubusercontent.com/the0rem/kubefactory/master/docs/images/environment-inject.png)
