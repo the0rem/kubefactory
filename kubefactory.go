@@ -17,9 +17,12 @@ import (
 )
 
 var (
+	err error
 
 	// Get path to current directory
-	filePath, err = filepath.Abs(filepath.Dir(os.Args[0]))
+	filePath, _ = filepath.Abs(filepath.Dir(os.Args[0]))
+
+	pwd, _ = os.Getwd()
 
 	/**
 	 * Initialise main app and general options
@@ -28,21 +31,21 @@ var (
 	debug       = app.Flag("debug", "Enable debug mode.").Bool()
 	appTest     = app.Flag("dryrun", "Take it for a test drive first.").Bool()
 	environment = app.Flag("environment", "Environment to control. Default 'dev'").Default("dev").String()
-	envFile     = app.Flag("envFile", "Environment file for connecting to kubernetes relative to the environment-specific directory. (Default: .kfenv)").Default("/.kfenv").String()
-	envDir      = app.Flag("envDir", "Root directory for environment directories").Default(filePath + "/environments/").String()
+	envFile     = app.Flag("envFile", "Environment file for connecting to kubernetes relative to the environment-specific directory. (Default: .kfenv)").Default(".kfenv").String()
+	envDir      = app.Flag("envDir", "Root directory for environment directories").Default(pwd + "/environments/").String()
 	// fleetctl    = app.Flag("fleetctl-endpoint", "Enpoint for fleetctl.").OverrideDefaultFromEnvar("FLEETCTL_ENDPOINT").URL()
 	// kubernetes  = app.Flag("kubernetes-master", "Enpoint for kubernetes.").OverrideDefaultFromEnvar("KUBERNETES_MASTER").URL()
 
 	/**
-	 * Add command to handle generating templates
+	 * Add command to generate the template environment
 	 */
-	// generate = app.Command("generate", "Generate a new deployment template.")
+	initialise = app.Command("init", "Initalise a new deployment folder.")
 
 	/**
 	 * Add command to handle building deployment files from templates
 	 */
 	build          = app.Command("build", "Configure a new deployment from template files.")
-	templateSource = build.Arg("templateSource", "Source directory for YAML deployment templates").Default(filePath + "/templates/").String()
+	templateSource = build.Arg("templateSource", "Source directory for YAML deployment templates").Default(pwd + "/templates/").String()
 	buildDest      = build.Arg("buildDest", "Destination directory for saving generated distribution files").Default(filePath + "/dist/").String()
 
 	/**
@@ -50,7 +53,7 @@ var (
 	 * @type {[type]}
 	 */
 	launch    = app.Command("launch", "Launch templates in an environment.")
-	launchSrc = launch.Arg("launchSrc", "Source directory for loading template files").Default(filePath + "/dist/").String()
+	launchSrc = launch.Arg("launchSrc", "Source directory for loading template files").Default(pwd + "/dist/").String()
 
 	/**
 	 * Add command to enter a container via bash
@@ -97,6 +100,10 @@ func main() {
 
 	// 	println((*generate).FullCommand())
 	// 	Generate()
+
+	case initialise.FullCommand():
+
+		Init(pwd, *envDir+"/"+*environment, *envDir+"/"+*environment+"/"+*envFile)
 
 	case build.FullCommand():
 
