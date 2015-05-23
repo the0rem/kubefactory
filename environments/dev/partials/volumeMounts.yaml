@@ -1,3 +1,0 @@
-- name: frontent-dev-volume
-  mountPath: /var/www/html
-  readOnly: true
