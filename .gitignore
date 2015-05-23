@@ -4,3 +4,7 @@ dist/
 templates/
 kubefactory
 .links
+.kubectl_dev
+.kubectl_dev.example
+.kubectl_prod
+.kubectl_prod.example
