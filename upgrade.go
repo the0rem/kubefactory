@@ -7,10 +7,10 @@ import (
 	"os"
 )
 
-func Upgrade(currentRC, filename, upgradeInterval string) {
+func (app *appConfig) Upgrade(currentRC, filename, upgradeInterval string) {
 
 	// Run the upgrade
-	msg, err := sh.Command("kubectl", "rolling-update", currentRC, "--filename="+filename, "--update-period="+upgradeInterval).Output()
+	msg, err := sh.Command("kubectl", "--kubeconfig="+app.envFile, "rolling-update", currentRC, "--filename="+filename, "--update-period="+upgradeInterval).Output()
 
 	if err != nil {
 		color.Red(fmt.Sprintf("Couldn't perform the upgrade: %s", err))

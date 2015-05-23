@@ -13,15 +13,30 @@ package main
 import (
 	"gopkg.in/alecthomas/kingpin.v1"
 	"os"
-	"path/filepath"
 )
 
+/**
+ *
+ */
+type appConfig struct {
+	debug       bool
+	appTest     bool
+	environment string
+	envFile     string
+	envDir      string
+	workingDir  string
+}
+
 var (
+	/**
+	 * Error variable
+	 */
 	err error
 
-	// Get path to current directory
-	filePath, _ = filepath.Abs(filepath.Dir(os.Args[0]))
-
+	/**
+	 * Get path to current directory
+	 * @type {string}
+	 */
 	pwd, _ = os.Getwd()
 
 	/**
@@ -33,8 +48,6 @@ var (
 	environment = app.Flag("environment", "Environment to control. Default 'dev'").Default("dev").String()
 	envFile     = app.Flag("envFile", "Environment file for connecting to kubernetes relative to the environment-specific directory. (Default: .kfenv)").Default(".kfenv").String()
 	envDir      = app.Flag("envDir", "Root directory for environment directories").Default(pwd + "/environments/").String()
-	// fleetctl    = app.Flag("fleetctl-endpoint", "Enpoint for fleetctl.").OverrideDefaultFromEnvar("FLEETCTL_ENDPOINT").URL()
-	// kubernetes  = app.Flag("kubernetes-master", "Enpoint for kubernetes.").OverrideDefaultFromEnvar("KUBERNETES_MASTER").URL()
 
 	/**
 	 * Add command to generate the template environment
@@ -46,7 +59,7 @@ var (
 	 */
 	build          = app.Command("build", "Configure a new deployment from template files.")
 	templateSource = build.Arg("templateSource", "Source directory for YAML deployment templates").Default(pwd + "/templates/").String()
-	buildDest      = build.Arg("buildDest", "Destination directory for saving generated distribution files").Default(filePath + "/dist/").String()
+	buildDest      = build.Arg("buildDest", "Destination directory for saving generated distribution files").Default(pwd + "/dist/").String()
 
 	/**
 	 * Add command to launch built configs
@@ -87,72 +100,104 @@ var (
 	linkRemove = link.Command("remove", "Disable and remove a link.")
 )
 
+/**
+ * [main description]
+ * @return {[type]} [description]
+ */
 func main() {
 
 	result := kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	// println(result)
-	// println()
+	// Initalise app config data
+	appConfig := appConfig{
+		debug:       *debug,
+		appTest:     *appTest,
+		envDir:      *envDir + *environment,
+		envFile:     *envDir + *environment + "/" + *envFile,
+		environment: *environment,
+		workingDir:  pwd,
+	}
 
 	switch result {
 
-	// case generate.FullCommand():
-
-	// 	println((*generate).FullCommand())
-	// 	Generate()
-
+	/**
+	 * Initialise project folder structure
+	 */
 	case initialise.FullCommand():
 
-		Init(pwd, *envDir+"/"+*environment, *envDir+"/"+*environment+"/"+*envFile)
+		appConfig.Init()
 
+	/**
+	 * Build templates for environment
+	 */
 	case build.FullCommand():
 
 		builder := new(builder)
-		builder.Configure(*buildDest, *templateSource, *envDir+*environment+"/")
+		builder.Configure(*buildDest, *templateSource, appConfig.envDir)
 		builder.Build()
 
+	/**
+	 * Launch built templates to environment
+	 */
 	case launch.FullCommand():
 
-		deployment := new(launchParams)
+		appConfig.Launch(*launchSrc)
 
-		deployment.Configure(*launchSrc, *envFile, *envDir+*environment+"/"+*envFile)
-		deployment.Launch()
-
+	/**
+	 * Enter a container
+	 */
 	case enter.FullCommand():
 
 		// Hamndle if only a pod is given
 		if *containerName != "" {
-			Enter(*podName, *containerName, *envDir+*environment+"/"+*envFile)
+			appConfig.Enter(*podName, *containerName)
 		} else {
-			Enter(*podName, *podName, *envDir+*environment+"/"+*envFile)
+			appConfig.Enter(*podName, *podName)
 		}
 
+	/**
+	 * Upgrade replication controller pods
+	 */
 	case upgrade.FullCommand():
 
-		Upgrade(*currentRC, *newRC, *upgradeInterval)
+		appConfig.Upgrade(*currentRC, *newRC, *upgradeInterval)
 
+	/**
+	 * List directory links
+	 */
 	case (*linkList).FullCommand():
 
 		dirSync := new(dirSync)
 		dirSync.List()
 
+	/**
+	 * Add directory link
+	 */
 	case (*linkAdd).FullCommand():
 
 		dirSync := new(dirSync)
-
 		dirSync.Configure(*linkFrom, *linkTo)
 		dirSync.Add()
 
+	/**
+	 * Remove directory link
+	 */
 	case (*linkRemove).FullCommand():
 
 		dirSync := new(dirSync)
 		dirSync.Remove()
 
+	/**
+	 * Enable directory link
+	 */
 	case (*linkUp).FullCommand():
 
 		dirSync := new(dirSync)
 		dirSync.Up()
 
+	/**
+	 * Disable directory link
+	 */
 	case (*linkDown).FullCommand():
 
 		dirSync := new(dirSync)

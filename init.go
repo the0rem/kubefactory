@@ -96,9 +96,13 @@ users:
       #auth-path:
 `)
 
-func Init(pwd, envDir, envFile string) {
+func (app *appConfig) Init() {
 
-	dirs := []string{pwd + "/dist", pwd + "/templates", envDir + "/partials"}
+	dirs := []string{
+		app.workingDir + "/dist",
+		app.workingDir + "/templates",
+		app.envDir + "/partials",
+	}
 
 	for _, directory := range dirs {
 
@@ -115,13 +119,13 @@ func Init(pwd, envDir, envFile string) {
 	}
 
 	// Initialise environment file
-	err := ioutil.WriteFile(envFile, configTemplate, 0644)
+	err := ioutil.WriteFile(app.envFile, configTemplate, 0644)
 
 	if err != nil {
-		color.Red(fmt.Sprintf("Could not create environment file: %s", envFile))
+		color.Red(fmt.Sprintf("Could not create environment file: %s", app.envFile))
 		os.Exit(1)
 	}
 
-	color.Green(fmt.Sprintf("Created environment file: %s", envFile))
+	color.Green(fmt.Sprintf("Created environment file: %s", app.envFile))
 
 }

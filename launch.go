@@ -4,86 +4,50 @@ import (
 	"fmt"
 	"github.com/codeskyblue/go-sh"
 	"github.com/fatih/color"
-	"github.com/joho/godotenv"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 )
 
-type launchParams struct {
-	distDir          string
-	environment      string
-	envFile          string
-	sourceFilePrefix string
-}
+/**
+ * [func description]
+ * @param  {[type]} app *appConfig)   Launch(distDir string [description]
+ * @return {[type]}     [description]
+ */
+func (app *appConfig) Launch(distDir string) {
 
-func (params *launchParams) Configure(distDir, environment, envFile string) {
-
-	params.distDir = distDir
-	params.environment = environment
-	params.envFile = envFile
+	app.LaunchTemplatesFromFolder(distDir)
+	app.GetClusterStatus()
 
 }
 
-func (params *launchParams) Launch() {
+/**
+ * [func description]
+ * @param  {[type]} app *appConfig)   LaunchTemplatesFromFolder(sourceDir string [description]
+ * @return {[type]}        [description]
+ */
+func (app *appConfig) LaunchTemplatesFromFolder(sourceDir string) {
 
-	var msg []byte
-
-	// Get list of files in dist
-	files, err := ioutil.ReadDir(params.distDir)
+	// Get list of files in sourceDir
+	files, err := ioutil.ReadDir(sourceDir)
 
 	// Check for error finding files
 	if err != nil {
 		color.Red(fmt.Sprintf("%s", err))
 	}
 
-	// Get env variables
-	err = godotenv.Load(params.envFile)
-
-	if err != nil {
-		color.Red(fmt.Sprintf("%s", err))
-	}
-
-	params.LaunchTemplatesFromFolder(files, "")
-
-	// Output status of machine
-	msg, err = sh.Command("kubectl", "--insecure-skip-tls-verify="+os.Getenv("LINK_INSECURE_SKIP_TLS_VERIFY"), "--username="+os.Getenv("LINK_USERNAME"), "--password="+os.Getenv("LINK_PASSWORD"), "--server="+os.Getenv("LINK_SERVER"), "cluster-info").Output()
-	color.Green("Cluster Info")
-	color.White(string(msg[:]))
-
-	msg, err = sh.Command("kubectl", "--insecure-skip-tls-verify="+os.Getenv("LINK_INSECURE_SKIP_TLS_VERIFY"), "--username="+os.Getenv("LINK_USERNAME"), "--password="+os.Getenv("LINK_PASSWORD"), "--server="+os.Getenv("LINK_SERVER"), "get", "minions").Output()
-	color.Green("Minions")
-	color.White(string(msg[:]))
-
-	msg, err = sh.Command("kubectl", "--insecure-skip-tls-verify="+os.Getenv("LINK_INSECURE_SKIP_TLS_VERIFY"), "--username="+os.Getenv("LINK_USERNAME"), "--password="+os.Getenv("LINK_PASSWORD"), "--server="+os.Getenv("LINK_SERVER"), "get", "services").Output()
-	color.Green("Services")
-	color.White(string(msg[:]))
-
-	msg, err = sh.Command("kubectl", "--insecure-skip-tls-verify="+os.Getenv("LINK_INSECURE_SKIP_TLS_VERIFY"), "--username="+os.Getenv("LINK_USERNAME"), "--password="+os.Getenv("LINK_PASSWORD"), "--server="+os.Getenv("LINK_SERVER"), "get", "replicationcontrollers").Output()
-	color.Green("Replication Controllers")
-	color.White(string(msg[:]))
-
-	msg, err = sh.Command("kubectl", "--insecure-skip-tls-verify="+os.Getenv("LINK_INSECURE_SKIP_TLS_VERIFY"), "--username="+os.Getenv("LINK_USERNAME"), "--password="+os.Getenv("LINK_PASSWORD"), "--server="+os.Getenv("LINK_SERVER"), "get", "pods").Output()
-	color.Green("Pods")
-	color.White(string(msg[:]))
-
-}
-
-func (params *launchParams) LaunchTemplatesFromFolder(files []os.FileInfo, subDir string) {
-
 	// Deploy generated template files to kubernetes endpoint
 	for _, file := range files {
 
-		filename := params.distDir + subDir + file.Name()
+		filename := sourceDir + file.Name()
 		// If file is dir, recurse function
 		if file.IsDir() {
 
-			buildFiles, _ := ioutil.ReadDir(params.distDir + subDir + file.Name())
-			params.LaunchTemplatesFromFolder(buildFiles, "/"+file.Name())
+			app.LaunchTemplatesFromFolder(filename + "/")
 			continue
 
 		}
 
+		// Only handle file if a yaml
 		if filepath.Ext(file.Name()) != ".yaml" {
 
 			color.Yellow(fmt.Sprintf("File %s is not a template", filename))
@@ -92,16 +56,45 @@ func (params *launchParams) LaunchTemplatesFromFolder(files []os.FileInfo, subDi
 		}
 
 		// Run create command on specified server
-		msg, err := sh.Command("kubectl", "--insecure-skip-tls-verify="+os.Getenv("LINK_INSECURE_SKIP_TLS_VERIFY"), "--username="+os.Getenv("LINK_USERNAME"), "--password="+os.Getenv("LINK_PASSWORD"), "--server="+os.Getenv("LINK_SERVER"), "create", "-f", filename).Output()
+		msg, err := sh.Command("kubectl", "--kubeconfig="+app.envFile, "create", "-f", filename).Output()
 
 		if err != nil {
 			color.Red(fmt.Sprintf("%s", err))
 		}
 
-		output := string(msg[:])
-
-		color.White(output)
+		color.White(string(msg[:]))
 
 	}
+
+}
+
+/**
+ * [func description]
+ * @param  {[type]} config *appConfig)   GetClusterStatus( [description]
+ * @return {[type]}        [description]
+ */
+func (app *appConfig) GetClusterStatus() {
+
+	var msg []byte
+
+	msg, _ = sh.Command("kubectl", "--kubeconfig="+app.envFile, "cluster-info").Output()
+	color.Green("Cluster Info")
+	color.White(string(msg[:]))
+
+	msg, _ = sh.Command("kubectl", "--kubeconfig="+app.envFile, "get", "minions").Output()
+	color.Green("Minions")
+	color.White(string(msg[:]))
+
+	msg, _ = sh.Command("kubectl", "--kubeconfig="+app.envFile, "get", "services").Output()
+	color.Green("Services")
+	color.White(string(msg[:]))
+
+	msg, _ = sh.Command("kubectl", "--kubeconfig="+app.envFile, "get", "replicationcontrollers").Output()
+	color.Green("Replication Controllers")
+	color.White(string(msg[:]))
+
+	msg, _ = sh.Command("kubectl", "--kubeconfig="+app.envFile, "get", "pods").Output()
+	color.Green("Pods")
+	color.White(string(msg[:]))
 
 }

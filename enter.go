@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/codeskyblue/go-sh"
 	"github.com/fatih/color"
-	"github.com/joho/godotenv"
 	"os"
 	"os/exec"
 	"strconv"
@@ -18,23 +17,15 @@ import (
  * @param {string} pod
  * @param {string} container
  */
-func Enter(pod, container, envFile string) {
+func (app *appConfig) Enter(pod, container string) {
 
 	var podName string
 	var containerName string
 	var podIndex int
 	var containerIndex int
 
-	// Get env variables
-	err = godotenv.Load(envFile)
-
-	if err != nil {
-		color.Red(fmt.Sprintf("%s", err))
-	}
-
 	// Look for pods starting with the given string
-	// TODO: Test what field awk needs to get from each line
-	msg, err := sh.Command("kubectl", "--insecure-skip-tls-verify="+os.Getenv("LINK_INSECURE_SKIP_TLS_VERIFY"), "--username="+os.Getenv("LINK_USERNAME"), "--password="+os.Getenv("LINK_PASSWORD"), "--server="+os.Getenv("LINK_SERVER"), "get", "pods").Command("grep", pod).Output()
+	msg, err := sh.Command("kubectl", "--kubeconfig="+app.envFile, "get", "pods").Command("grep", pod).Output()
 
 	if err != nil {
 		color.Red(fmt.Sprintf("Couldn't find the given pod %s", err))
@@ -107,7 +98,7 @@ func Enter(pod, container, envFile string) {
 	}
 
 	// Set arguments for an interactive bash terminal
-	args := []string{"--insecure-skip-tls-verify=" + os.Getenv("LINK_INSECURE_SKIP_TLS_VERIFY"), "--username=" + os.Getenv("LINK_USERNAME"), "--password=" + os.Getenv("LINK_PASSWORD"), "--server=" + os.Getenv("LINK_SERVER"), "exec", "-c", containerName, "-p", podName, "-i", "-t", "--", "bash", "-il"}
+	args := []string{"--kubeconfig=" + app.envFile, "exec", "-c", containerName, "-p", podName, "-i", "-t", "--", "bash", "-il"}
 
 	// Add environment variables
 	env := os.Environ()
