@@ -3,3 +3,4 @@ environments/
 dist/
 templates/
 kubefactory
+.links
