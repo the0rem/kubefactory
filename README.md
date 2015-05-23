@@ -11,9 +11,7 @@ This package aims to solve the logistics around deploying your applications to d
 
 ## TODO
 
- - [X] Launch built templates
- - [X] Enter containers
- - [ ] Finalise environment variables for kubectl integration
+ - [ ] Add example templates to expose full features
 
 
 ## Usage
@@ -46,9 +44,10 @@ Show help for a command.
   kubefactory help [<command>]
 ```
 
-### Generate TODO
+### Init
 
-This will handle genation of deployment templates. The feature will involve an interactive command line to build a template based on the answers given. The features will be basic to begin with (simple pods, services, rcs) with metadata.
+Initialise the default project folder structure including an example config file.
+
 
 ### Build 
 
@@ -111,6 +110,8 @@ Launch templates in an environment.
 ### Enter 
 
 Open an interactive terminal within a container. This is useful for gaining access to containers when developing, or debugging critical issues in production. You can liken it to SSH access.
+
+Don't know the container name? Don't worry. This interactive command will help get you there.
 
 ```
   kubefactory enter <podName> [<containerName>]

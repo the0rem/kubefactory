@@ -1,0 +1,473 @@
+
+kind: Pod
+apiVersion: v1beta3
+metadata:
+  # Name is unique within a namespace.  Name is required when creating resources, although
+  # some resources may allow a client to request the generation of an appropriate name
+  # automatically. Name is primarily intended for creation idempotence and configuration
+  # definition.
+  # 
+  # String that identifies an object. Must be unique within a namespace; 
+  # Cannot be updated.
+  name: 
+
+  # GenerateName indicates that the name should be made unique by the server prior to persisting
+  # it. A non-empty value for the field indicates the name will be made unique (and the name
+  # returned to the client will be different than the name passed). The value of this field will
+  # be combined with a unique suffix on the server if the Name field has not been provided.
+  # The provided value must be valid within the rules for Name, and may be truncated by the length
+  # of the suffix required to make the value unique on the server.
+  #
+  # If this field is specified, and Name is not present, the server will NOT return a 409 if the
+  # generated name exists - instead, it will either return 201 Created or 500 with Reason
+  # ServerTimeout indicating a unique name could not be found in the time allotted, and the client
+  # should retry (optionally after the time indicated in the Retry-After header).
+  generateName:
+
+  # Namespace defines the space within which name must be unique. An empty namespace is
+  # equivalent to the "default" namespace, but "default" is the canonical representation.
+  # Not all objects are required to be scoped to a namespace - the value of this field for
+  # those objects will be empty.
+  namespace:
+
+  # Labels are key value pairs that may be used to scope and select individual resources.
+  labels:
+    name: value
+
+  # Annotations are unstructured key value data stored with a resource that may be set by
+  # external tooling. They are not queryable and should be preserved when modifying
+  # objects.
+  annotations:
+    name: value
+
+# Spec defines the behavior of a pod
+spec:
+
+  # List of volumes that can be mounted by containers belonging to the pod
+  volumes:
+
+      # Required: This must be a DNS_LABEL.  Each volume in a pod must have a unique name.
+    - name: value
+
+      # Source represents the location and type of a volume to mount.
+      # This is optional for now. If not specified, the Volume is implied to be an EmptyDir.
+      # This implied behavior is deprecated and will be removed in a future version.
+      source: 
+
+        # HostPath represents a pre-existing file or directory on the host
+        # machine that is directly exposed to the container. This is generally
+        # used for system agents or other privileged things that are allowed
+        # to see the host machine. Most containers will NOT need this.
+        hostPath:
+
+          # Path of the directory on the host.
+          path:
+
+        # EmptyDir represents a temporary directory that shares a pod's lifetime.
+        emptyDir:
+
+          # Optional: what type of storage medium should back this directory.
+          # The default is "" which means to use the node's default medium.
+          medium:
+
+        # GCEPersistentDisk represents a GCE Disk resource that is attached to a
+        # kubelet's host machine and then exposed to the pod.
+        gcePersistentDisk:
+
+          # Unique name of the PD resource. Used to identify the disk in GCE.
+          pdName:
+
+          # Required: Filesystem type to mount.
+          # Must be a filesystem type supported by the host operating system.
+          # Ex. "ext4", "xfs", "ntfs"
+          fsType:
+
+          # Optional: Partition on the disk to mount.
+          # If omitted, kubelet will attempt to mount the device name.
+          # Ex. For /dev/sda1, this field is "1", for /dev/sda, this field is 0 or empty.
+          partition:
+
+          # Optional: Defaults to false (read/write). ReadOnly here will force
+          # the ReadOnly setting in VolumeMounts.
+          readOnly:
+
+        # AWSElasticBlockStore represents an AWS Disk resource that is attached to a
+        # kubelet's host machine and then exposed to the pod.
+        awsElasticBlockStore:
+
+          # Unique id of the PD resource. Used to identify the disk in AWS.
+          volumeID:
+
+          # Required: Filesystem type to mount.
+          # Must be a filesystem type supported by the host operating system.
+          # Ex. "ext4", "xfs", "ntfs"
+          fsType:
+
+          # Optional: Partition on the disk to mount.
+          # If omitted, kubelet will attempt to mount the device name.
+          # Ex. For /dev/sda1, this field is "1", for /dev/sda, this field is 0 or empty.
+          partition:
+
+          # Optional: Defaults to false (read/write). ReadOnly here will force
+          # the ReadOnly setting in VolumeMounts.
+          readOnly:
+
+        # GitRepo represents a git repository at a particular revision.
+        gitRepo:
+
+          # Repository URL.
+          repository:
+
+          # Commit hash, this is optional.
+          revision:
+
+        # Secret represents a secret that should populate this volume.
+        secret: 
+
+          # Name of the secret in the pod's namespace to use
+          secretName: 
+
+        # NFS represents an NFS mount on the host that shares a pod's lifetime.
+        nfs:
+
+          # Server is the hostname or IP address of the NFS server.
+          server:
+
+          # The path that is exported by the NFS server
+          path:
+
+          # Optional: Defaults to false (read/write). ReadOnly here will force
+          # the NFS export to be mounted with read-only permissions
+          readOnly:
+
+        # ISCSI represents an ISCSI Disk resource that is attached to a
+        # kubelet's host machine and then exposed to the pod.
+        iscsi: 
+
+          # Required: iSCSI target portal
+          # the portal is either an IP or ip_addr:port if port is other than default (typically TCP ports 860 and 3260).
+          targetPortal:
+
+          # Required:  target iSCSI Qualified Name.
+          iqn:
+
+          # Required: iSCSI target lun number.
+          lun:
+
+          # Required: Filesystem type to mount.
+          # Must be a filesystem type supported by the host operating system.
+          # Ex. "ext4", "xfs", "ntfs"
+          fsType:
+
+          # Optional: Defaults to false (read/write). ReadOnly here will force
+          # the ReadOnly setting in VolumeMounts.
+          readOnly:
+
+        # Glusterfs represents a Glusterfs mount on the host that shares a pod's lifetime.
+        glusterfs:
+
+          # Required: EndpointsName is the endpoint name that details Glusterfs topology.
+          endpoints: 
+
+          # Required: Path is the Glusterfs volume path.
+          path:
+
+          # Optional: Defaults to false (read/write). ReadOnly here will force
+          # the Glusterfs volume to be mounted with read-only permissions.
+          readOnly:
+
+        # PersistentVolumeClaimVolumeSource represents a reference to a PersistentVolumeClaim in the same namespace.
+        persistentVolumeClaim:
+
+          # ClaimName is the name of a PersistentVolumeClaim in the same namespace as the pod using this volume.
+          claimName: 
+
+          # Optional: Defaults to false (read/write).
+          # ReadOnly here will force the ReadOnly setting in VolumeMounts.
+          readOnly:
+
+  # list of containers belonging to the pod; cannot be updated; containers cannot currently be added or removed; 
+  # There must be at least one container in a Pod
+  containers:
+
+      # Name of the container; must be a DNS_LABEL and unique within the pod; cannot be updated.
+    - name: 
+
+      # Docker image name.
+      image: 
+
+      # Optional: The docker image's entrypoint is used if this is not provided; cannot be updated.
+      command: []
+
+      # Optional: The docker image's cmd is used if this is not provided; cannot be updated.
+      args: []
+
+      # Container's working directory; defaults to image's default; cannot be updated.
+      workingDir: 
+
+      # List of ports to expose from the container; cannot be updated.
+      ports:
+
+          # Optional: If specified, this must be a DNS_LABEL.  
+          # Each named port in a pod must have a unique name.
+        - name: value
+
+          # Optional: If specified, this must be a valid port number, 0 < x < 65536.
+          # If HostNetwork is specified, this must match ContainerPort.
+          hostPort: 
+
+          # Required: This must be a valid port number, 0 < x < 65536.
+          containerPort: 80
+
+          # Protocol for port; must be UDP or TCP; TCP if unspecified.
+          protocol: TCP
+
+          # Optional: What host IP to bind the external port to.
+          hostIP:
+
+      # List of environment variables to set in the container; cannot be updated.
+      env:
+
+          # Required: This must be a C_IDENTIFIER.
+        - name: 
+
+          # Optional: No more than one of the following may be set.
+
+          # Value of the environment variable; defaults to empty string.
+          value: 
+
+          # Source for the environment variable's value; cannot be used if value is not empty.
+          valueFrom: 
+
+      # Compute Resources required by this container; cannot be updated.
+      resources:
+
+        # Limits describes the maximum amount of compute resources required.
+        limits: 
+
+          # CPU, in cores. (500m = .5 cores).
+          cpu: 
+
+          # Memory, in bytes. (500Gi = 500GiB = 500 * 1024 * 1024 * 1024)
+          memory: 
+
+          # Volume size, in bytes (e,g. 5Gi = 5GiB = 5 * 1024 * 1024 * 1024)
+          storage: 
+
+        # Requests describes the minimum amount of compute resources required.
+        # Note: 'Requests' are honored only for Persistent Volumes as of now.
+        requests: 
+
+          # CPU, in cores. (500m = .5 cores).
+          cpu: 
+
+          # Memory, in bytes. (500Gi = 500GiB = 500 * 1024 * 1024 * 1024)
+          memory: 
+
+          # Volume size, in bytes (e,g. 5Gi = 5GiB = 5 * 1024 * 1024 * 1024)
+          storage: 
+
+      # Pod volumes to mount into the container's filesystem; cannot be updated
+      volumeMounts:
+
+          # Required: This must match the Name of a Volume.
+        - name: value
+
+          # Path within the container at which the volume should be mounted.
+          mountPath: /path/to/mount
+
+          # Mounted read-only if true, read-write otherwise
+          readOnly: true
+
+      # Periodic probe of container liveness; container will be restarted if the probe fails; cannot be updated.
+      livenessProbe:
+
+        # Length of time before health checking is activated. In seconds.
+        initialDelaySeconds:
+
+        # Length of time before health checking times out.  In seconds.
+        timeoutSeconds: 
+
+        # The action taken to determine the health of a container
+        # One and only one of the following should be specified.
+
+        # Exec specifies the action to take.
+        exec: 
+          # Command is the command line to execute inside the container, the working directory for the
+          # command  is root ('/') in the container's filesystem.  The command is simply exec'd, it is
+          # not run inside a shell, so traditional shell instructions ('|', etc) won't work.  To use
+          # a shell, you need to explicitly call out to that shell.
+          command: []
+
+        # HTTPGet specifies the http request to perform.
+        httpGet: 
+
+          # Optional: Path to access on the HTTP server.
+          path:
+
+          # Required: Name or number of the port to access on the container.
+          port:
+
+          # Optional: Host name to connect to, defaults to the pod IP.
+          host:
+
+      # Periodic probe of container service readiness; container will be removed from service endpoints if the probe fails; cannot be updated.
+      readinessProbe:
+
+        # Length of time before health checking is activated. In seconds.
+        initialDelaySeconds:
+
+        # Length of time before health checking times out.  In seconds.
+        timeoutSeconds: 
+
+        # The action taken to determine the health of a container
+        # One and only one of the following should be specified.
+
+        # Exec specifies the action to take.
+        exec: 
+          # Command is the command line to execute inside the container, the working directory for the
+          # command  is root ('/') in the container's filesystem.  The command is simply exec'd, it is
+          # not run inside a shell, so traditional shell instructions ('|', etc) won't work.  To use
+          # a shell, you need to explicitly call out to that shell.
+          command: []
+
+        # HTTPGet specifies the http request to perform.
+        httpGet: 
+
+          # Optional: Path to access on the HTTP server.
+          path:
+
+          # Required: Name or number of the port to access on the container.
+          port:
+
+          # Optional: Host name to connect to, defaults to the pod IP.
+          host:
+
+      # Actions that the management system should take in response to container lifecycle events; cannot be updated.
+      lifecycle:
+
+        # PostStart is called immediately after a container is created. 
+        # If the handler fails, the container is terminated and restarted.
+        postStart: 
+
+          # One and only one of the following should be specified.
+
+          # Exec specifies the action to take.
+          exec: 
+            # Command is the command line to execute inside the container, the working directory for the
+            # command  is root ('/') in the container's filesystem.  The command is simply exec'd, it is
+            # not run inside a shell, so traditional shell instructions ('|', etc) won't work.  To use
+            # a shell, you need to explicitly call out to that shell.
+            command: []
+
+          # HTTPGet specifies the http request to perform.
+          httpGet: 
+
+            # Optional: Path to access on the HTTP server.
+            path:
+
+            # Required: Name or number of the port to access on the container.
+            port:
+
+            # Optional: Host name to connect to, defaults to the pod IP.
+            host:
+
+
+        # PreStop is called immediately before a container is terminated.  
+        # The reason for termination is passed to the handler. 
+        # Regardless of the outcome of the handler, the container is eventually terminated.
+        preStop: 
+
+          # One and only one of the following should be specified.
+
+          # Exec specifies the action to take.
+          exec: 
+            # Command is the command line to execute inside the container, the working directory for the
+            # command  is root ('/') in the container's filesystem.  The command is simply exec'd, it is
+            # not run inside a shell, so traditional shell instructions ('|', etc) won't work.  To use
+            # a shell, you need to explicitly call out to that shell.
+            command: []
+
+          # HTTPGet specifies the http request to perform.
+          httpGet: 
+
+            # Optional: Path to access on the HTTP server.
+            path:
+
+            # Required: Name or number of the port to access on the container.
+            port:
+
+            # Optional: Host name to connect to, defaults to the pod IP.
+            host:
+
+      # Path at which the file to which the container's termination message will be written is mounted into the container's filesystem; message written is intended to be brief final status, such as an assertion failure message; cannot be updated.
+      # Defaults to /dev/termination-log
+      terminationMessagePath:
+
+      # Image pull policy; one of PullAlways, PullNever, PullIfNotPresent; defaults to PullAlways if :latest tag is specified, or PullIfNotPresent otherwise; cannot be updated.
+      imagePullPolicy: PullAlways
+
+      # Security options the pod should run with
+      securityContext:
+
+        # Capabilities are the capabilities to add/drop when running the container.
+        capabilities:
+
+          # Added capabilities
+          # CapabilityType represent POSIX array of capability types
+          add: []
+
+          # Removed capabilities
+          # CapabilityType represent POSIX array of capability types
+          drop: []
+
+        # Run the container in privileged mode
+        privileged: false
+
+        # Options that control the SELinux labels applied
+        seLinuxOptions:
+
+          # SELinux user label.
+          user:
+
+          # SELinux role label.
+          role:
+
+          # SELinux type label.
+          type:
+
+          # SELinux level label.
+          level:
+
+        # RunAsUser is the UID to run the entrypoint of the container process.
+        runAsUser: 
+
+  # Restart policy for all containers within the pod; one of RestartPolicyAlways, RestartPolicyOnFailure, RestartPolicyNever"
+  restartPolicy: RestartPolicyOnFailure
+
+  # Optional duration in seconds the pod needs to terminate gracefully. May be decreased in delete request.
+  # Value must be non-negative integer. The value zero indicates delete immediately.
+  # If this value is nil, the default grace period will be used instead.
+  # The grace period is the duration in seconds after the processes running in the pod are sent
+  # a termination signal and the time when the processes are forcibly halted with a kill signal.
+  # Set this value longer than the expected cleanup time for your process.
+  terminationGracePeriodSeconds:
+
+  # DNS policy for containers within the pod; one of 'ClusterFirst' or 'Default'"
+  # Optional: Set DNS policy.  Defaults to "ClusterFirst"
+  dnsPolicy: 
+
+  # NodeSelector is a selector which must be true for the pod to fit on a node
+  nodeSelector:
+    key: value
+
+  # Host is a request to schedule this pod onto a specific host.  If it is non-empty,
+  # the the scheduler simply schedules this pod onto that host, assuming that it fits
+  # resource requirements.
+  host: 
+
+  # Uses the host's network namespace. If this option is set, the ports that will be
+  # used must be specified.
+  # Optional: Default to false.
+  hostNetwork: false
+
