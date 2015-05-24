@@ -1,7 +1,7 @@
 README.html
-environments/
-dist/
-templates/
+/environments/
+/dist/
+/templates/
 kubefactory
 .links
 .kubectl_dev

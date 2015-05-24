@@ -1,0 +1,153 @@
+
+kind: PersistentVolume
+apiVersion: v1beta3
+metadata:
+  # Name is unique within a namespace.  Name is required when creating resources, although
+  # some resources may allow a client to request the generation of an appropriate name
+  # automatically. Name is primarily intended for creation idempotence and configuration
+  # definition.
+  # 
+  # String that identifies an object. Must be unique within a namespace; 
+  # Cannot be updated.
+  name: 
+
+  # GenerateName indicates that the name should be made unique by the server prior to persisting
+  # it. A non-empty value for the field indicates the name will be made unique (and the name
+  # returned to the client will be different than the name passed). The value of this field will
+  # be combined with a unique suffix on the server if the Name field has not been provided.
+  # The provided value must be valid within the rules for Name, and may be truncated by the length
+  # of the suffix required to make the value unique on the server.
+  #
+  # If this field is specified, and Name is not present, the server will NOT return a 409 if the
+  # generated name exists - instead, it will either return 201 Created or 500 with Reason
+  # ServerTimeout indicating a unique name could not be found in the time allotted, and the client
+  # should retry (optionally after the time indicated in the Retry-After header).
+  generateName:
+
+  # Namespace defines the space within which name must be unique. An empty namespace is
+  # equivalent to the "default" namespace, but "default" is the canonical representation.
+  # Not all objects are required to be scoped to a namespace - the value of this field for
+  # those objects will be empty.
+  namespace:
+
+  # Labels are key value pairs that may be used to scope and select individual resources.
+  labels:
+    name: value
+
+  # Annotations are unstructured key value data stored with a resource that may be set by
+  # external tooling. They are not queryable and should be preserved when modifying
+  # objects.
+  annotations:
+    name: value
+
+# Spec defines the behavior of a pod
+spec:
+
+  # A description of the persistent volume's resources and capacity.
+  capacity:
+
+    # Volume size, in bytes (e,g. 5Gi = 5GiB = 5 * 1024 * 1024 * 1024)
+    storage: 
+
+  # Source represents the location and type of a volume to mount.
+  # Only one of the following is required
+
+  # GCEPersistentDisk represents a GCE Disk resource that is attached to a
+  # kubelet's host machine and then exposed to the pod.
+  gcePersistentDisk: 
+
+    # Unique name of the PD resource. Used to identify the disk in GCE.
+    pdName:
+
+    # Required: Filesystem type to mount.
+    # Must be a filesystem type supported by the host operating system.
+    # Ex. "ext4", "xfs", "ntfs"
+    fsType:
+
+    # Optional: Partition on the disk to mount.
+    # If omitted, kubelet will attempt to mount the device name.
+    # Ex. For /dev/sda1, this field is "1", for /dev/sda, this field is 0 or empty.
+    partition:
+
+    # Optional: Defaults to false (read/write). ReadOnly here will force
+    # the ReadOnly setting in VolumeMounts.
+    readOnly:
+
+  # AWSElasticBlockStore represents an AWS Disk resource that is attached to a
+  # kubelet's host machine and then exposed to the pod.
+  awsElasticBlockStore:
+
+    # Unique id of the PD resource. Used to identify the disk in AWS.
+    volumeID:
+
+    # Required: Filesystem type to mount.
+    # Must be a filesystem type supported by the host operating system.
+    # Ex. "ext4", "xfs", "ntfs"
+    fsType:
+
+    # Optional: Partition on the disk to mount.
+    # If omitted, kubelet will attempt to mount the device name.
+    # Ex. For /dev/sda1, this field is "1", for /dev/sda, this field is 0 or empty.
+    partition:
+
+    # Optional: Defaults to false (read/write). ReadOnly here will force
+    # the ReadOnly setting in VolumeMounts.
+    readOnly:
+
+  # HostPath represents a directory on the host.
+  # This is useful for development and testing only.
+  # on-host storage is not supported in any way.
+  hostPath: 
+
+    # Path of the directory on the host.
+    path:
+
+  # Glusterfs represents a Glusterfs volume that is attached to a host and exposed to the pod.
+  glusterfs:
+
+    # Required: EndpointsName is the endpoint name that details Glusterfs topology.
+    endpoints: 
+
+    # Required: Path is the Glusterfs volume path.
+    path:
+
+    # Optional: Defaults to false (read/write). ReadOnly here will force
+    # the Glusterfs volume to be mounted with read-only permissions.
+    readOnly:
+
+  # NFS represents an NFS mount on the host.
+  nfs:
+
+    # Server is the hostname or IP address of the NFS server.
+    server:
+
+    # The path that is exported by the NFS server
+    path:
+
+    # Optional: Defaults to false (read/write). ReadOnly here will force
+    # the NFS export to be mounted with read-only permissions
+    readOnly:
+
+
+
+  # AccessModes contains all ways the volume can be mounted
+  accessModes: 
+    - ReadWriteOnce
+    - ReadOnlyMany
+    - ReadWriteMany
+
+  # Holds the binding reference to a PersistentVolumeClaim
+  claimRef: nameOfPersistentVolumeClaim
+
+
+
+
+
+
+
+
+
+
+
+
+
