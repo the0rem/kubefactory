@@ -1,0 +1,73 @@
+
+kind: Service
+apiVersion: v1beta3
+metadata:
+  # Name is unique within a namespace.  Name is required when creating resources, although
+  # some resources may allow a client to request the generation of an appropriate name
+  # automatically. Name is primarily intended for creation idempotence and configuration
+  # definition.
+  # 
+  # String that identifies an object. Must be unique within a namespace; 
+  # Cannot be updated.
+  name: repository-service
+
+  # Namespace defines the space within which name must be unique. An empty namespace is
+  # equivalent to the "default" namespace, but "default" is the canonical representation.
+  # Not all objects are required to be scoped to a namespace - the value of this field for
+  # those objects will be empty.
+  namespace: repository
+
+  # Labels are key value pairs that may be used to scope and select individual resources.
+  labels:
+    name: repository-service
+
+# Spec defines the behavior of a service.
+spec: 
+
+  # Required: The list of ports that are exposed by this service.
+  ports: 
+
+      # Optional if only one ServicePort is defined on this service: The
+      # name of this port within the service.  This must be a DNS_LABEL.
+      # All ports within a ServiceSpec must have unique names.  This maps to
+      # the 'Name' field in EndpointPort objects.
+    - name:
+
+      # The protocol used by this port; must be UDP or TCP; TCP if unspecified.
+      protocol: TCP
+
+      # The port that will be exposed by this service.
+      port: 
+
+      # Optional: The target port on pods selected by this service.
+      # If this is a string, it will be looked up as a named port in the
+      # target Pod's container ports.  If this is not specified, the value
+      # of Port is used (an identity map).
+      targetPort:
+
+  # This service will route traffic to pods having labels matching this selector. 
+  # If null, no endpoints will be automatically created. If empty, all pods will be selected.
+  selector: 
+    name: repository-pod
+
+  # PortalIP is usually assigned by the master.  If specified by the user
+  # we will try to respect it or else fail the request.  This field can
+  # not be changed by updates.
+  # Valid values are None, empty string (""), or a valid IP address
+  # None can be specified for headless services when proxying is not required.
+  portalIP:
+
+  # Set up a cloud-provider-specific load balancer on an external IP.
+  createExternalLoadBalancer: false
+
+  # PublicIPs are used by external load balancers, or can be set by
+  # users to handle external traffic that arrives at a node.
+  publicIPs: []
+
+  # Optional: Supports "ClientIP" and "None".  Used to maintain session affinity.
+  sessionAffinity: None
+
+
+
+
+
