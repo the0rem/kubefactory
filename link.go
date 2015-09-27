@@ -162,7 +162,7 @@ func (link *dirSync) Up() {
 	// First show current links
 	link.List()
 
-	// Prompt user to choose which link to remove
+	// Prompt user to choose which link to enable
 	consolereader := bufio.NewReader(os.Stdin)
 	fmt.Print("Enter the link number you want to enable: ")
 
@@ -248,7 +248,7 @@ func (link *dirSync) Down() {
 }
 
 /**
- * Re-initialises a link
+ * Initialise/re-initialise a link
  * @param  {[type]} from [description]
  * @param  {[type]} to   string)       (msg, err [description]
  * @return {[type]}      [description]
