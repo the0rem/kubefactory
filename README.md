@@ -10,15 +10,15 @@ This package aims to solve the logistics around deploying your applications to d
 
 ## TODO
 
+ - [ ] Convert yamlthingy to golang
  - [ ] Add example templates to expose full features of Kubernetes
  - [ ] Build SkyDNS deployment template
  - [ ] Add logstash/kabana deployment template for logging
- - [ ] Add API access for commands
+ - [ ] Make CLI commands API acceessible
  - [ ] Add logging for commands
- - [ ] Add post-event hooks for commands
- - [ ] Integrate rafecolton/docker-builder into a docker build and build API hook command (currently has features for queueing and serving the API which we should bring upstream)
- - [ ] Add feature to package a Dockerfile with dependencies to run kubefactory for a specific environment
- - [ ] Add releases for architecture environments
+ - [?] Add post-event hooks for commands
+ - [?] Add feature to package a Dockerfile with dependencies to run kubefactory for a specific environment
+ - [ ] Add releases for architecture environments (Mac OSX, Debian, Fedora, RHEL, Windows)
 
 # Goal
 
@@ -65,7 +65,11 @@ Initialise the default project folder structure including an example config file
 Builds an environment-specific release of your deployment using your deployment templates along with your environmental files.
 
 ```
-  kubefactory build [<envDir> [<templateSource> [<buildDest>]]]
+  kubefactory build [<flags>] [<envDir> [<templateSource> [<buildDest>]]]
+
+  Flags:
+    --replaceMarker="Override the default regex match in the YAML file used for injecting environment-specific YAML 
+                        content. The default ([a-zA-Z0-9-_]+):\\s#\\1# will match string: #string# and will import the contents of string.yaml from the environment directory.
 
   Args:
     [<envDir>]          Root directory for environment directories
@@ -76,7 +80,7 @@ Builds an environment-specific release of your deployment using your deployment 
 
 ### Launch 
 
-Launch templates in an environment.
+Launch templates to an environment.
 
 ```
   kubefactory launch [<launchSrc>]
