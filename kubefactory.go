@@ -58,6 +58,7 @@ var (
 	 * Add command to handle building deployment files from templates
 	 */
 	build          = app.Command("build", "Configure a new deployment from template files.")
+	replaceMarker  = build.Flag("replaceMarker", "Override the default regex match in the YAML file used for injecting environment-specific YAML content. The default [a-zA-Z0-9-_]+:\\s#(.*)# will match string: #string# and will import the contents of string.yaml from the environment directory.").Default("[a-zA-Z0-9-_]+:\\s#(.*)#").String()
 	templateSource = build.Arg("templateSource", "Source directory for YAML deployment templates").Default(pwd + "/templates/").String()
 	buildDest      = build.Arg("buildDest", "Destination directory for saving generated distribution files").Default(pwd + "/dist/").String()
 
@@ -133,7 +134,7 @@ func main() {
 	case build.FullCommand():
 
 		builder := new(builder)
-		builder.Configure(*buildDest, *templateSource, appConfig.envDir)
+		builder.Configure(*buildDest, *templateSource, appConfig.envDir, *replaceMarker)
 		builder.Build()
 
 	/**

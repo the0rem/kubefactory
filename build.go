@@ -14,6 +14,7 @@ type builder struct {
 	destination    string
 	templateSource string
 	envSource      string
+	replaceMarker  string
 	ignoreDirs     []string
 }
 
@@ -22,9 +23,10 @@ type builder struct {
  * @param  {[type]} build *builder)     Configure(destination, templateSource, envSource string [description]
  * @return {[type]}       [description]
  */
-func (build *builder) Configure(destination, templateSource, envSource string) {
+func (build *builder) Configure(destination, templateSource, envSource, replaceMarker string) {
 
 	build.ignoreDirs = append(build.ignoreDirs, "partials")
+	build.replaceMarker = replaceMarker
 
 	// Ensure all required directory entries exist
 	directories := []string{destination, templateSource, envSource}
@@ -165,7 +167,7 @@ fileLoop:
  */
 func (build *builder) ParseTemplate(filename string) (output string, err error) {
 
-	msg, err := sh.Command("python2.7", "yamlthingy.py", "--templatefile", filename, "--marker", "[a-zA-Z0-9-_]+:\\s#(.*)#", "--envdir", build.envSource+"partials/").Output()
+	msg, err := sh.Command("python2.7", "yamlthingy.py", "--templatefile", filename, "--marker", build.replaceMarker, "--envdir", build.envSource+"partials/").Output()
 
 	// Convert byte array to string
 	output = string(msg[:])
